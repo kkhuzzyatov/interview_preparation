@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.firstandroidapp"
+    namespace = "com.interviewpreparation"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.firstandroidapp"
+        applicationId = "com.interviewpreparation"
         minSdk = 24
         targetSdk = 37
         versionCode = 1

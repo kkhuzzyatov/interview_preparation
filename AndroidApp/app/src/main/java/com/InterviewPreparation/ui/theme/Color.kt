@@ -1,4 +1,4 @@
-package com.firstandroidapp.ui.theme
+package com.interviewpreparation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

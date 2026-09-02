@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FirstAndroidApp"
+rootProject.name = "InterviewPreparation"
 include(":app")

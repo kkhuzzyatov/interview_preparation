@@ -1,4 +1,4 @@
-package com.firstandroidapp
+package com.interviewpreparation
 
 data class Desk(
     val name: String,

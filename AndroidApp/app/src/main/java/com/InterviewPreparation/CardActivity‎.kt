@@ -1,4 +1,4 @@
-package com.firstandroidapp
+package com.interviewpreparation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

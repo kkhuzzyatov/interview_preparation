@@ -1,4 +1,4 @@
-package com.firstandroidapp
+package com.interviewpreparation
 
 import org.junit.Test
 
