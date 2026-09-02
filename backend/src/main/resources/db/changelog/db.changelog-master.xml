@@ -3,7 +3,31 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="
-            http://www.liquibase.org/xml/ns/dbchangelog
-            https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+           http://www.liquibase.org/xml/ns/dbchangelog
+           https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1" author="kamil">
+        <sqlFile
+                path="sql/table_creating.sql"
+                relativeToChangelogFile="true"
+                splitStatements="true"
+                stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="2" author="kamil">
+        <sqlFile
+                path="sql/desks_insert.sql"
+                relativeToChangelogFile="true"
+                splitStatements="true"
+                stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="3" author="kamil">
+        <sqlFile
+                path="sql/insert_cards.sql"
+                relativeToChangelogFile="true"
+                splitStatements="true"
+                stripComments="true"/>
+    </changeSet>
 
 </databaseChangeLog>
