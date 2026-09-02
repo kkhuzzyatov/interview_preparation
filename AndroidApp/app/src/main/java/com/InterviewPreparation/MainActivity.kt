@@ -15,8 +15,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,57 +29,90 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.interviewpreparation.ui.theme.InterviewPreparationTheme
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val desks = listOf(
-            Desk(
-                name = "NLP",
-                cardsNew = 20,
-                cardsForgotten = 1,
-                cardsRepeat = 1,
-            ),
-            Desk(
-                name = "SWE Interviews",
-                cardsNew = 20,
-                cardsForgotten = 3,
-                cardsRepeat = 0,
-            ),
-            Desk(
-                name = "Machine Learning",
-                cardsNew = 0,
-                cardsForgotten = 0,
-                cardsRepeat = 85,
-            ),
-            Desk(
-                name = "Design Patterns",
-                cardsNew = 20,
-                cardsForgotten = 2,
-                cardsRepeat = 0,
-            ),
-        )
-
         enableEdgeToEdge()
+
         setContent {
             InterviewPreparationTheme {
-                if (desks.isEmpty()) {
-                    EmptyCollectionImage()
-                } else {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 32.dp)
-                    ) {
-                        desks.forEach { desk ->
-                            DeskView(desk)
-                        }
-                    }
+                DeskScreen()
+            }
+        }
+    }
+}
+
+@Composable
+fun DeskScreen(
+    viewModel: DeskViewModel = viewModel()
+) {
+    val desks by viewModel.desks.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    when {
+        isLoading -> {
+            LoadingScreen()
+        }
+
+        error != null -> {
+            ErrorScreen(error!!)
+        }
+
+        desks.isEmpty() -> {
+            EmptyCollectionImage()
+        }
+
+        else -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 32.dp)
+            ) {
+                desks.forEach { desk ->
+                    DeskView(desk)
                 }
             }
         }
+    }
+}
+
+@Composable
+fun LoadingScreen() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun ErrorScreen(error: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Failed to load desks",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            text = error,
+            modifier = Modifier.padding(top = 8.dp),
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -112,7 +148,10 @@ fun DeskView(desk: Desk) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                val intent = Intent(context, CardActivity::class.java).apply {
+                val intent = Intent(
+                    context,
+                    CardActivity::class.java
+                ).apply {
                     putExtra("cardsNew", desk.cardsNew)
                     putExtra("cardsForgotten", desk.cardsForgotten)
                     putExtra("cardsRepeat", desk.cardsRepeat)
@@ -120,7 +159,10 @@ fun DeskView(desk: Desk) {
 
                 context.startActivity(intent)
             }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(
+                horizontal = 16.dp,
+                vertical = 8.dp
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
