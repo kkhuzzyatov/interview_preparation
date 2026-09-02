@@ -1,0 +1,66 @@
+# =========================
+# IntelliJ IDEA / Android Studio
+# =========================
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# =========================
+# Gradle
+# =========================
+.gradle/
+**/build/
+
+# Keep project build scripts
+!build.sh
+!**/build.sh
+
+# =========================
+# Android
+# =========================
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+
+# =========================
+# Kotlin
+# =========================
+.kotlin/
+
+# =========================
+# Spring / JVM
+# =========================
+*.class
+*.jar
+*.war
+*.ear
+
+# =========================
+# Environment / secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# macOS
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.swp
+*.swo
+*~
