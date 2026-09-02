@@ -24,6 +24,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.firstandroidapp.ui.theme.FirstAndroidAppTheme
+import android.content.Intent
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.platform.LocalContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,9 +106,20 @@ fun EmptyCollectionImage() {
 
 @Composable
 fun DeskView(desk: Desk) {
+    val context = LocalContext.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable {
+                val intent = Intent(context, CardActivity::class.java).apply {
+                    putExtra("cardsNew", desk.cardsNew)
+                    putExtra("cardsForgotten", desk.cardsForgotten)
+                    putExtra("cardsRepeat", desk.cardsRepeat)
+                }
+
+                context.startActivity(intent)
+            }
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
