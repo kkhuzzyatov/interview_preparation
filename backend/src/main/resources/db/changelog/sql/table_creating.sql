@@ -14,3 +14,15 @@ CREATE TABLE cards (
         REFERENCES desks(desk_id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE answers (
+    answer_id UUID PRIMARY KEY,
+    card_id UUID NOT NULL,
+    score INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_answers_card
+        FOREIGN KEY (card_id)
+        REFERENCES cards(card_id)
+        ON DELETE CASCADE
+);
