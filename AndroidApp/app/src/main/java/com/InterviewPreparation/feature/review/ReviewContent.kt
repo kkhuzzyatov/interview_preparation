@@ -4,10 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -39,22 +38,21 @@ fun ReviewContent(
             color = MaterialTheme.colorScheme.primary,
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(
+            modifier = Modifier.height(20.dp),
+        )
 
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            ),
-        ) {
-            Text(
-                text = reviewCard.question,
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.titleMedium,
-            )
-        }
+        Text(
+            text = reviewCard.question,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            style = MaterialTheme.typography.titleMedium,
+        )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(
+            modifier = Modifier.height(24.dp),
+        )
 
         if (answerResponse == null) {
             Text(
@@ -63,7 +61,9 @@ fun ReviewContent(
                 fontWeight = FontWeight.Bold,
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(
+                modifier = Modifier.height(8.dp),
+            )
 
             OutlinedTextField(
                 value = answer,
@@ -76,7 +76,9 @@ fun ReviewContent(
                 enabled = !isSubmitting,
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
 
             Button(
                 onClick = onSubmit,
@@ -84,7 +86,10 @@ fun ReviewContent(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 if (isSubmitting) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        modifier = Modifier.height(20.dp),
+                        strokeWidth = 2.dp,
+                    )
                 } else {
                     Text("SUBMIT")
                 }
@@ -108,21 +113,27 @@ private fun ReviewResult(
         content = answer,
     )
 
-    Spacer(modifier = Modifier.height(20.dp))
+    Spacer(
+        modifier = Modifier.height(20.dp),
+    )
 
     ReviewSection(
         title = "Score",
         content = response.score.toString(),
     )
 
-    Spacer(modifier = Modifier.height(20.dp))
+    Spacer(
+        modifier = Modifier.height(20.dp),
+    )
 
     ReviewSection(
         title = "Feedback",
         content = response.feedback,
     )
 
-    Spacer(modifier = Modifier.height(20.dp))
+    Spacer(
+        modifier = Modifier.height(20.dp),
+    )
 
     ReviewSection(
         title = "Correct Answer",
@@ -145,19 +156,16 @@ private fun ReviewSection(
             color = MaterialTheme.colorScheme.primary,
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(
+            modifier = Modifier.height(8.dp),
+        )
 
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            ),
-        ) {
-            Text(
-                text = content,
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-        }
+        Text(
+            text = content,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            style = MaterialTheme.typography.bodyLarge,
+        )
     }
 }

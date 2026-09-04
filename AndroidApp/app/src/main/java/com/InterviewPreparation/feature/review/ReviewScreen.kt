@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -40,11 +41,13 @@ fun reviewScreen(
     var reviewCard by remember { mutableStateOf<ReviewCardResponse?>(null) }
     var answerResponse by remember { mutableStateOf<AnswerResponse?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
+
     var isLoading by remember { mutableStateOf(true) }
     var isSubmitting by remember { mutableStateOf(false) }
     var isLoadingNext by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
     suspend fun loadNextQuestion() {
         isLoading = true
@@ -58,6 +61,10 @@ fun reviewScreen(
 
             if (response.isSuccessful) {
                 reviewCard = response.body()
+
+                if (reviewCard == null) {
+                    error = "No review cards available."
+                }
             } else {
                 reviewCard = null
                 error = "Failed to load review card (${response.code()})"
@@ -67,6 +74,60 @@ fun reviewScreen(
             error = e.message ?: "Failed to load review card"
         } finally {
             isLoading = false
+        }
+    }
+
+    fun submitAnswer() {
+        val card = reviewCard ?: return
+
+        val cardId = try {
+            UUID.fromString(card.cardId)
+        } catch (e: IllegalArgumentException) {
+            error = "Invalid review card ID"
+            return
+        }
+
+        isSubmitting = true
+        error = null
+
+        scope.launch {
+            try {
+                val response: Response<AnswerResponse> =
+                    api.answer(
+                        cardId = cardId,
+                        request = AnswerRequest(
+                            answer = answer,
+                        ),
+                    )
+
+                if (response.isSuccessful) {
+                    val result = response.body()
+
+                    if (result != null) {
+                        answerResponse = result
+                    } else {
+                        error = "Empty response from server"
+                    }
+                } else {
+                    error = "Failed to submit answer (${response.code()})"
+                }
+            } catch (e: Exception) {
+                error = e.message ?: "Failed to submit answer"
+            } finally {
+                isSubmitting = false
+            }
+        }
+    }
+
+    fun loadNext() {
+        scope.launch {
+            isLoadingNext = true
+
+            try {
+                loadNextQuestion()
+            } finally {
+                isLoadingNext = false
+            }
         }
     }
 
@@ -80,7 +141,7 @@ fun reviewScreen(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .padding(24.dp),
             verticalArrangement = Arrangement.Top,
         ) {
@@ -90,7 +151,9 @@ fun reviewScreen(
                 Text("BACK")
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(
+                modifier = Modifier.height(24.dp),
+            )
 
             when {
                 isLoading -> {
@@ -98,22 +161,14 @@ fun reviewScreen(
                 }
 
                 error != null -> {
-                    Text(
-                        text = error!!,
-                        color = MaterialTheme.colorScheme.error,
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(
-                        onClick = {
+                    ErrorContent(
+                        message = error!!,
+                        onRetry = {
                             scope.launch {
                                 loadNextQuestion()
                             }
                         },
-                    ) {
-                        Text("Try again")
-                    }
+                    )
                 }
 
                 reviewCard != null -> {
@@ -122,52 +177,8 @@ fun reviewScreen(
                         answer = answer,
                         answerResponse = answerResponse,
                         isSubmitting = isSubmitting,
-                        onAnswerChange = {
-                            answer = it
-                        },
-                        onSubmit = {
-                            val cardIdString =
-                                reviewCard?.cardId ?: return@ReviewContent
-
-                            val cardId = try {
-                                UUID.fromString(cardIdString)
-                            } catch (e: IllegalArgumentException) {
-                                error = "Invalid review card ID"
-                                return@ReviewContent
-                            }
-
-                            isSubmitting = true
-                            error = null
-
-                            scope.launch {
-                                try {
-                                    val response: Response<AnswerResponse> =
-                                        api.answer(
-                                            cardId = cardId,
-                                            request = AnswerRequest(
-                                                answer = answer,
-                                            ),
-                                        )
-
-                                    if (response.isSuccessful) {
-                                        answerResponse = response.body()
-
-                                        if (answerResponse == null) {
-                                            error = "Empty response from server"
-                                        }
-                                    } else {
-                                        error =
-                                            "Failed to submit answer (${response.code()})"
-                                    }
-                                } catch (e: Exception) {
-                                    error =
-                                        e.message
-                                            ?: "Failed to submit answer"
-                                } finally {
-                                    isSubmitting = false
-                                }
-                            }
-                        },
+                        onAnswerChange = { answer = it },
+                        onSubmit = ::submitAnswer,
                     )
                 }
 
@@ -182,35 +193,52 @@ fun reviewScreen(
 
         if (answerResponse != null) {
             Button(
-                onClick = {
-                    scope.launch {
-                        isLoadingNext = true
-
-                        try {
-                            loadNextQuestion()
-                        } finally {
-                            isLoadingNext = false
-                        }
-                    }
-                },
+                onClick = ::loadNext,
                 enabled = !isLoadingNext,
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(
                         start = 24.dp,
                         end = 24.dp,
                         bottom = 24.dp,
-                    )
-                    .fillMaxSize(),
+                    ),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF4CAF50),
                 ),
             ) {
                 if (isLoadingNext) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        modifier = Modifier.height(20.dp),
+                        strokeWidth = 2.dp,
+                    )
                 } else {
                     Text("Next question")
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ErrorContent(
+    message: String,
+    onRetry: () -> Unit,
+) {
+    Column {
+        Text(
+            text = message,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodyLarge,
+        )
+
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+
+        Button(
+            onClick = onRetry,
+        ) {
+            Text("Try again")
         }
     }
 }
