@@ -8,17 +8,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.interviewpreparation.domain.model.Desk
 import com.interviewpreparation.domain.model.DeskStatistics
 
 @Composable
 fun deskList(
-    desks: List<Desk>,
     statistics: List<DeskStatistics>,
     onDeskClick: (String) -> Unit,
 ) {
-    val statisticsByDeskId = statistics.associateBy { it.deskId }
-
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -26,16 +22,14 @@ fun deskList(
 
         LazyColumn {
             items(
-                items = desks,
-                key = { it.id },
-            ) { desk ->
-                val count = statisticsByDeskId[desk.id]?.total ?: 0
+                items = statistics,
+                key = { it.deskId },
+            ) { deskStatistics ->
 
                 deskRow(
-                    name = desk.name,
-                    count = count,
+                    desk = deskStatistics,
                     onClick = {
-                        onDeskClick(desk.id.toString())
+                        onDeskClick(deskStatistics.deskId.toString())
                     },
                 )
 

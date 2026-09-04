@@ -11,7 +11,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.interviewpreparation.feature.home.components.deskList
 import com.interviewpreparation.feature.home.components.reviewCard
 
@@ -39,7 +38,6 @@ fun homeScreen(
         Spacer(modifier = Modifier.height(28.dp))
 
         deskList(
-            desks = state.desks,
             statistics = state.statistics,
             onDeskClick = onDeskClick,
         )

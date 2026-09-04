@@ -53,6 +53,7 @@ fun appNavigation() {
 
         composable("review") {
             reviewScreen(
+                api = api,
                 onBack = {
                     navController.popBackStack()
                 },
@@ -60,7 +61,6 @@ fun appNavigation() {
         }
 
         composable("desk/{deskId}") { backStackEntry ->
-
             val deskId =
                 backStackEntry.arguments
                     ?.getString("deskId")
