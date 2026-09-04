@@ -31,6 +31,7 @@ services:
       OPENAI_BASE_URL: ${OPENAI_BASE_URL}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       OPENAI_MODEL: ${OPENAI_MODEL}
+      APP_JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8080:8080"
     depends_on:
