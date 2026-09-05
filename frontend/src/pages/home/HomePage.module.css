@@ -1,0 +1,190 @@
+.page {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+  box-sizing: border-box;
+}
+
+.review {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+
+  padding: 32px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.reviewContent {
+  min-width: 0;
+}
+
+.eyebrow {
+  margin-bottom: 8px;
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+}
+
+.review h1 {
+  margin: 0;
+
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #111827;
+}
+
+.startButton {
+  flex-shrink: 0;
+
+  min-width: 120px;
+  padding: 14px 24px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #111827;
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.startButton:hover {
+  background: #1f2937;
+}
+
+.startButton:active {
+  transform: translateY(1px);
+}
+
+.desksSection {
+  margin-top: 48px;
+}
+
+.desksSection h2 {
+  margin: 0 0 16px;
+
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+}
+
+.deskList {
+  display: flex;
+  flex-direction: column;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.desk {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  min-height: 64px;
+  padding: 0 8px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.deskName {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.stat {
+  min-width: 12px;
+  text-align: center;
+}
+
+.blue {
+  color: #2563eb;
+}
+
+.red {
+  color: #dc2626;
+}
+
+.yellow {
+  color: #ca8a04;
+}
+
+.green {
+  color: #16a34a;
+}
+
+.total {
+  margin-left: 2px;
+  color: #6b7280;
+}
+
+.message {
+  padding: 24px 8px;
+
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.error {
+  padding: 16px;
+
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+
+  background: #fef2f2;
+  color: #dc2626;
+
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 24px 16px 48px;
+  }
+
+  .review {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 24px;
+  }
+
+  .startButton {
+    width: 100%;
+  }
+
+  .desk {
+    gap: 12px;
+  }
+
+  .stats {
+    gap: 9px;
+    font-size: 14px;
+  }
+}
