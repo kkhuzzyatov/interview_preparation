@@ -1,6 +1,7 @@
 package com.backend.answer.entity
 
 import com.backend.card.entity.Card
+import com.backend.user.entity.User
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -18,6 +19,13 @@ class Answer(
     @Id
     @Column(name = "answer_id", nullable = false)
     val id: UUID,
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+        name = "user_id",
+        nullable = false,
+        foreignKey = ForeignKey(name = "fk_answers_user"),
+    )
+    var user: User,
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
         name = "card_id",

@@ -1,6 +1,7 @@
 CREATE TABLE users (
     user_id UUID PRIMARY KEY,
-    name VARCHAR(64) NOT NULL
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE desks (
