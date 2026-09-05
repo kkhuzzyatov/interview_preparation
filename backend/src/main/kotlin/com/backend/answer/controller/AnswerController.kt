@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.security.Principal
 import java.util.UUID
 
 @RestController
@@ -26,16 +27,25 @@ class AnswerController(
             description = AnswerApiMessages.OK,
         ),
         ApiResponse(
+            responseCode = AnswerApiCodes.UNAUTHORIZED,
+            description = AnswerApiMessages.UNAUTHORIZED,
+        ),
+        ApiResponse(
             responseCode = AnswerApiCodes.NOT_FOUND,
             description = AnswerApiMessages.NOT_FOUND,
         ),
     )
     @PostMapping("/{cardId}")
     fun answer(
+        principal: Principal,
         @PathVariable cardId: UUID,
         @RequestBody request: AnswerRequest,
     ): ResponseEntity<AnswerResponse> =
         ResponseEntity.ok(
-            answerService.answer(cardId, request),
+            answerService.answer(
+                cardId = cardId,
+                request = request,
+                principal = principal,
+            ),
         )
 }

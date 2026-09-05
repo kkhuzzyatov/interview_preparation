@@ -8,9 +8,12 @@ import com.backend.card.entity.Card
 import com.backend.card.repository.CardRepository
 import com.backend.client.OpenAiApiClient
 import com.backend.exceptions.CardNotFoundException
+import com.backend.exceptions.UserIsNotExistException
+import com.backend.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import tools.jackson.databind.ObjectMapper
+import java.security.Principal
 import java.time.Clock
 import java.time.LocalDateTime
 import java.util.UUID
@@ -19,6 +22,7 @@ import java.util.UUID
 class AnswerService(
     private val cardRepository: CardRepository,
     private val answerRepository: AnswerRepository,
+    private val userRepository: UserRepository,
     private val openAiApiClient: OpenAiApiClient,
     private val objectMapper: ObjectMapper,
     private val clock: Clock,
@@ -27,7 +31,18 @@ class AnswerService(
     fun answer(
         cardId: UUID,
         request: AnswerRequest,
+        principal: Principal,
     ): AnswerResponse {
+        val userId =
+            UUID.fromString(principal.name)
+
+        val user =
+            userRepository
+                .findById(userId)
+                .orElseThrow {
+                    UserIsNotExistException("Authenticated user $userId does not exist")
+                }
+
         val card =
             cardRepository
                 .findById(cardId)
@@ -46,6 +61,7 @@ class AnswerService(
         val answer =
             Answer(
                 id = UUID.randomUUID(),
+                user = user,
                 card = card,
                 score = evaluation.score,
                 createdAt = LocalDateTime.now(clock),
