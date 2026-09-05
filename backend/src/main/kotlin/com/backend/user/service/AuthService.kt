@@ -28,7 +28,7 @@ class AuthService(
             User(
                 id = UUID.randomUUID(),
                 email = email,
-                passwordHash = passwordEncoder.encode(password),
+                passwordHash = requireNotNull(passwordEncoder.encode(password)),
             )
 
         return userRepository.save(user)
