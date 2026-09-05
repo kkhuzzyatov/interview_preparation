@@ -13,6 +13,10 @@ export default function Header() {
       >
         HOME
       </button>
+
+      <div className={styles.version}>
+        v0.8
+      </div>
     </header>
   );
 }
