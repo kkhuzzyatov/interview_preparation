@@ -3,7 +3,9 @@
 set -e
 
 echo "==> Building application locally..."
+cd backend
 ./gradlew bootJar --no-daemon
+cd ..
 
 echo "==> Removing old containers..."
 docker compose down

@@ -84,7 +84,12 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val config =
             CorsConfiguration().apply {
-                allowedOrigins = listOf(frontendProperties.url)
+                allowedOrigins =
+                    listOf(
+                        frontendProperties.url,
+                        "http://localhost:5173",
+                    )
+
                 allowedMethods =
                     listOf(
                         "GET",
@@ -94,6 +99,7 @@ class SecurityConfig(
                         "OPTIONS",
                         "PATCH",
                     )
+
                 allowedHeaders = listOf("*")
             }
 
