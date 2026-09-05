@@ -32,7 +32,7 @@ export default function LoginPage() {
         response.token
       );
 
-      navigate("/tasks");
+      navigate("/home");
 
     } catch (err) {
       setError(
@@ -48,7 +48,7 @@ export default function LoginPage() {
       <div className={styles.card}>
         <div className={styles.header}>
           <h1>Welcome back</h1>
-          <p>Sign in to manage your tasks</p>
+          <p>Sign in to start learning</p>
         </div>
 
         <form onSubmit={handleSubmit}>

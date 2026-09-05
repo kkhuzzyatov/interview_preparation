@@ -22,9 +22,9 @@ export default function NotFound() {
 
         <button
           className={styles.button}
-          onClick={() => navigate("/tasks")}
+          onClick={() => navigate("/home")}
         >
-          Back to tasks
+          Back to Home
         </button>
       </div>
     </main>

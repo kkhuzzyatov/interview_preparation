@@ -72,7 +72,7 @@ export default function RegisterPage() {
       );
 
 
-      navigate("/tasks", {
+      navigate("/home", {
         replace: true,
       });
 
@@ -100,7 +100,7 @@ export default function RegisterPage() {
           </h1>
 
           <p>
-            Start managing your tasks today
+            Start learning questions today
           </p>
         </div>
 
