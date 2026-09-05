@@ -18,10 +18,8 @@ services:
       retries: 10
 
   backend:
-    platform: linux/amd64
-    image: khuzzyatov/interview-preparation-backend:latest
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: interview-preparation-backend
     environment:
@@ -40,6 +38,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    depends_on:
+      - backend
+
+    ports:
+      - "5173:80"
 
 volumes:
   postgres_data_interview_preparation:
