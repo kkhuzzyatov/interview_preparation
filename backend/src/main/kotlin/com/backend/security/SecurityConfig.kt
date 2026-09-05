@@ -30,31 +30,34 @@ class SecurityConfig(
             }.csrf { csrf ->
                 csrf.disable()
             }.sessionManagement { session ->
-                session.sessionCreationPolicy(
-                    SessionCreationPolicy.IF_REQUIRED,
-                )
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }.authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers(HttpMethod.POST, "/api/user")
-                    .permitAll()
-                    .requestMatchers("/api/auth/login")
-                    .permitAll()
+                    // Public authentication endpoints
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/user",
+                        "/api/auth/login",
+                    ).permitAll()
+                    // Swagger / OpenAPI
+                    .requestMatchers(
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                    ).permitAll()
+                    // Existing public endpoints
                     .requestMatchers(
                         "/actuator/**",
-                        "/swagger-ui/**",
-                        "/api-docs/**",
                         "/openapi.yml",
-                        "/v3/api-docs",
+                        "/internal/**",
                     ).permitAll()
-                    .requestMatchers("/internal/**")
-                    .permitAll()
+                    // Everything else requires authentication
                     .anyRequest()
                     .authenticated()
             }.addFilterBefore(
                 jwtFilter,
                 UsernamePasswordAuthenticationFilter::class.java,
-            ).exceptionHandling { ex ->
-                ex
+            ).exceptionHandling { exceptions ->
+                exceptions
                     .authenticationEntryPoint { _, response, _ ->
                         response.status = HttpServletResponse.SC_UNAUTHORIZED
                         response.contentType = MediaType.APPLICATION_JSON_VALUE
