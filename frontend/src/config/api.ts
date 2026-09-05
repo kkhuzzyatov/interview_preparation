@@ -1,7 +1,5 @@
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ??
-  "http://94.103.3.251:8080";
-
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
 
 export const API_ENDPOINTS = {
   auth: {
@@ -13,14 +11,17 @@ export const API_ENDPOINTS = {
     current: "/api/user",
   },
 
-  task: {
-    list: "/api/task",
-
-    byId: (id: string) =>
-      `/api/task/${id}`,
+  answer: {
+    evaluate: (cardId: string) => `/api/answer/${cardId}`,
   },
 
-  report: {
-    generate: "/api/report/generate",
+  review: {
+    next: "/api/review/next",
+  },
+
+  desks: {
+    all: "/api/desks",
+    byId: (deskId: string) => `/api/desks/${deskId}`,
+    statistics: "/api/desks/statistics",
   },
 };
