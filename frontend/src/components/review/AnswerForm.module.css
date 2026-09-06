@@ -1,0 +1,144 @@
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  margin-bottom: 10px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #374151;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 14px 16px;
+
+  box-sizing: border-box;
+  resize: vertical;
+
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #111827;
+
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.textarea::placeholder {
+  color: #9ca3af;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.submitButton,
+.revealButton {
+  flex: 1;
+  min-height: 44px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.submitButton {
+  padding: 12px 24px;
+
+  border: 1px solid #111827;
+
+  background: #111827;
+  color: #ffffff;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #1f2937;
+  border-color: #1f2937;
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.revealButton {
+  padding: 12px 24px;
+
+  border: 1px solid #d1d5db;
+
+  background: transparent;
+  color: #374151;
+}
+
+.revealButton:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.revealButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.revealButton:focus-visible,
+.submitButton:focus-visible {
+  outline: 2px solid #6b7280;
+  outline-offset: 2px;
+}
+
+.submitButton:disabled,
+.revealButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  margin-top: 12px;
+  padding: 12px 14px;
+
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+
+  background: #fef2f2;
+  color: #dc2626;
+
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .actions {
+    flex-direction: column;
+  }
+
+  .submitButton,
+  .revealButton {
+    width: 100%;
+  }
+}

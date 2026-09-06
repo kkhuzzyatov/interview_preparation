@@ -3,24 +3,34 @@ import styles from "./ReviewPage.module.css";
 import {
   getNextReviewCard,
   submitAnswer,
+  revealAnswer,
 } from "../../api/reviewApi";
+import AnswerForm from "../../components/review/AnswerForm";
 
 export default function ReviewPage() {
   const [card, setCard] = useState(null);
   const [answer, setAnswer] = useState("");
   const [result, setResult] = useState(null);
+  const [wasRevealed, setWasRevealed] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [revealing, setRevealing] = useState(false);
   const [loadingNext, setLoadingNext] = useState(false);
   const [error, setError] = useState("");
 
-  async function loadCard() {
+  async function fetchCard({ initial = false } = {}) {
     try {
-      setLoading(true);
+      if (initial) {
+        setLoading(true);
+      } else {
+        setLoadingNext(true);
+      }
+
       setError("");
       setResult(null);
       setAnswer("");
+      setWasRevealed(false);
 
       const data = await getNextReviewCard();
       setCard(data);
@@ -30,14 +40,21 @@ export default function ReviewPage() {
           ? err.message
           : "Failed to load review card"
       );
-      setCard(null);
+
+      if (initial) {
+        setCard(null);
+      }
     } finally {
-      setLoading(false);
+      if (initial) {
+        setLoading(false);
+      } else {
+        setLoadingNext(false);
+      }
     }
   }
 
   useEffect(() => {
-    loadCard();
+    fetchCard({ initial: true });
   }, []);
 
   async function handleSubmit(event) {
@@ -50,6 +67,7 @@ export default function ReviewPage() {
     try {
       setSubmitting(true);
       setError("");
+      setWasRevealed(false);
 
       const data = await submitAnswer(
         card.cardId,
@@ -68,32 +86,49 @@ export default function ReviewPage() {
     }
   }
 
-  async function handleNextQuestion() {
-    try {
-      setLoadingNext(true);
-      setError("");
-      setResult(null);
-      setAnswer("");
+  async function handleReveal() {
+    if (!card) {
+      return;
+    }
 
-      const data = await getNextReviewCard();
-      setCard(data);
+    try {
+      setRevealing(true);
+      setError("");
+
+      const data = await revealAnswer(card.cardId);
+
+      setWasRevealed(true);
+
+      setResult({
+        score: 0,
+        feedback: null,
+        correctAnswer: data.correctAnswer,
+      });
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Failed to load next question"
+          : "Failed to reveal correct answer"
       );
     } finally {
-      setLoadingNext(false);
+      setRevealing(false);
     }
   }
+
+  function handleAnswerChange(value) {
+    setAnswer(value);
+
+    if (error) {
+      setError("");
+    }
+  }
+
+  const isProcessing = submitting || revealing;
 
   if (loading) {
     return (
       <main className={styles.page}>
-        <div className={styles.message}>
-          Loading...
-        </div>
+        <div className={styles.message}>Loading...</div>
       </main>
     );
   }
@@ -120,79 +155,63 @@ export default function ReviewPage() {
         </div>
 
         {!result && (
-          <form
-            className={styles.form}
+          <AnswerForm
+            answer={answer}
+            onAnswerChange={handleAnswerChange}
             onSubmit={handleSubmit}
-          >
-            <label
-              className={styles.label}
-              htmlFor="answer"
-            >
-              Your answer
-            </label>
-
-            <textarea
-              id="answer"
-              className={styles.textarea}
-              value={answer}
-              onChange={(event) =>
-                setAnswer(event.target.value)
-              }
-              placeholder="Your answer"
-              rows={8}
-              required
-            />
-
-            {error && (
-              <div className={styles.error}>
-                {error}
-              </div>
-            )}
-
-            <button
-              className={styles.submitButton}
-              type="submit"
-              disabled={
-                submitting || !answer.trim()
-              }
-            >
-              {submitting ? "Submitting..." : "Submit"}
-            </button>
-          </form>
+            onReveal={handleReveal}
+            isProcessing={isProcessing}
+            submitting={submitting}
+            revealing={revealing}
+            error={error}
+          />
         )}
 
         {result && (
           <div className={styles.result}>
-            <div className={styles.score}>
-              Score: {result.score}
-            </div>
+            {!wasRevealed && (
+              <>
+                {result.score !== undefined && (
+                  <div className={styles.score}>
+                    Score: {result.score}
+                  </div>
+                )}
 
-            <div className={styles.userAnswer}>
-              <strong>Your answer:</strong>
-              <div>{answer}</div>
-            </div>
+                {answer && (
+                  <div className={styles.userAnswer}>
+                    <strong>Your answer:</strong>
+                    <div>{answer}</div>
+                  </div>
+                )}
 
-            {result.feedback && (
-              <div className={styles.feedback}>
-                <strong>Feedback:</strong>
-                <div>{result.feedback}</div>
-              </div>
+                {result.feedback && (
+                  <div className={styles.feedback}>
+                    <strong>Feedback:</strong>
+                    <div>{result.feedback}</div>
+                  </div>
+                )}
+              </>
             )}
 
             {result.correctAnswer && (
               <div className={styles.correctAnswer}>
                 <strong>Correct answer:</strong>
-                <div>{result.correctAnswer}</div>
+
+                <div className={styles.correctAnswerText}>
+                  {result.correctAnswer}
+                </div>
               </div>
             )}
 
             <button
               className={styles.nextButton}
               type="button"
-              onClick={handleNextQuestion}
+              onClick={() => fetchCard()}
               disabled={loadingNext}
             >
-              {loadingNext ? "Loading..." : "Next question"}
+              {loadingNext
+                ? "Loading..."
+                : "Next question"}
             </button>
           </div>
         )}
