@@ -2,6 +2,7 @@ package com.backend.answer.controller
 
 import com.backend.answer.controller.dto.AnswerRequest
 import com.backend.answer.controller.dto.AnswerResponse
+import com.backend.answer.controller.dto.RevealAnswerResponse
 import com.backend.answer.service.AnswerService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -45,6 +46,33 @@ class AnswerController(
             answerService.answer(
                 cardId = cardId,
                 request = request,
+                principal = principal,
+            ),
+        )
+
+    @Operation(summary = "Reveal the correct answer without AI evaluation")
+    @ApiResponses(
+        ApiResponse(
+            responseCode = AnswerApiCodes.OK,
+            description = AnswerApiMessages.OK,
+        ),
+        ApiResponse(
+            responseCode = AnswerApiCodes.UNAUTHORIZED,
+            description = AnswerApiMessages.UNAUTHORIZED,
+        ),
+        ApiResponse(
+            responseCode = AnswerApiCodes.NOT_FOUND,
+            description = AnswerApiMessages.NOT_FOUND,
+        ),
+    )
+    @PostMapping("/{cardId}/reveal")
+    fun reveal(
+        principal: Principal,
+        @PathVariable cardId: UUID,
+    ): ResponseEntity<RevealAnswerResponse> =
+        ResponseEntity.ok(
+            answerService.reveal(
+                cardId = cardId,
                 principal = principal,
             ),
         )

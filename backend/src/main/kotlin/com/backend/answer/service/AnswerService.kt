@@ -2,6 +2,7 @@ package com.backend.answer.service
 
 import com.backend.answer.controller.dto.AnswerRequest
 import com.backend.answer.controller.dto.AnswerResponse
+import com.backend.answer.controller.dto.RevealAnswerResponse
 import com.backend.answer.entity.Answer
 import com.backend.answer.repository.AnswerRepository
 import com.backend.card.entity.Card
@@ -33,20 +34,9 @@ class AnswerService(
         request: AnswerRequest,
         principal: Principal,
     ): AnswerResponse {
-        val userId =
-            UUID.fromString(principal.name)
+        val user = getUser(principal)
 
-        val user =
-            userRepository
-                .findById(userId)
-                .orElseThrow {
-                    UserIsNotExistException("Authenticated user $userId does not exist")
-                }
-
-        val card =
-            cardRepository
-                .findById(cardId)
-                .orElseThrow { CardNotFoundException(cardId) }
+        val card = getCard(cardId)
 
         val prompt =
             buildPrompt(
@@ -75,6 +65,47 @@ class AnswerService(
             correctAnswer = card.answer,
         )
     }
+
+    @Transactional
+    fun reveal(
+        cardId: UUID,
+        principal: Principal,
+    ): RevealAnswerResponse {
+        val user = getUser(principal)
+
+        val card = getCard(cardId)
+
+        val answer =
+            Answer(
+                id = UUID.randomUUID(),
+                user = user,
+                card = card,
+                score = 0,
+                createdAt = LocalDateTime.now(clock),
+            )
+
+        answerRepository.save(answer)
+
+        return RevealAnswerResponse(
+            correctAnswer = card.answer,
+        )
+    }
+
+    private fun getUser(principal: Principal) =
+        userRepository
+            .findById(UUID.fromString(principal.name))
+            .orElseThrow {
+                UserIsNotExistException(
+                    "Authenticated user ${principal.name} does not exist",
+                )
+            }
+
+    private fun getCard(cardId: UUID): Card =
+        cardRepository
+            .findById(cardId)
+            .orElseThrow {
+                CardNotFoundException(cardId)
+            }
 
     private fun buildPrompt(
         card: Card,

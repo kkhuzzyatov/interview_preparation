@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
@@ -58,21 +59,112 @@ class SecurityConfig(
                 UsernamePasswordAuthenticationFilter::class.java,
             ).exceptionHandling { exceptions ->
                 exceptions
-                    .authenticationEntryPoint { _, response, _ ->
+                    .authenticationEntryPoint { request, response, authException ->
+
+                        val authentication =
+                            SecurityContextHolder
+                                .getContext()
+                                .authentication
+
+                        // TEMPORARY DEBUG LOGGING
+                        println("========================================")
+                        println("AUTHENTICATION ENTRY POINT")
+                        println("Method: ${request.method}")
+                        println("URI: ${request.requestURI}")
+                        println("Query: ${request.queryString}")
+                        println("Remote address: ${request.remoteAddr}")
+                        println(
+                            "Authorization header present: " +
+                                (request.getHeader("Authorization") != null),
+                        )
+                        println(
+                            "Authentication class: " +
+                                (authentication?.javaClass?.name ?: "null"),
+                        )
+                        println(
+                            "Authentication authenticated: " +
+                                (authentication?.isAuthenticated ?: false),
+                        )
+                        println(
+                            "Principal: " +
+                                (authentication?.principal ?: "null"),
+                        )
+                        println(
+                            "Exception class: " +
+                                authException.javaClass.name,
+                        )
+                        println(
+                            "Exception message: " +
+                                (authException.message ?: "null"),
+                        )
+                        println("========================================")
+
                         response.status = HttpServletResponse.SC_UNAUTHORIZED
                         response.contentType = MediaType.APPLICATION_JSON_VALUE
                         response.characterEncoding = "UTF-8"
 
+                        val exceptionMessage =
+                            authException.message
+                                ?.replace("\"", "'")
+                                ?.replace("\n", " ")
+                                ?.replace("\r", " ")
+                                ?: "unknown"
+
                         response.writer.write(
-                            """{"status":401,"message":"Неавторизован или токен истёк"}""",
+                            """
+                            {
+                              "status": 401,
+                              "message": "Неавторизован или токен истёк",
+                              "debug": {
+                                "method": "${request.method}",
+                                "uri": "${request.requestURI}",
+                                "authentication": "${authentication?.javaClass?.simpleName ?: "null"}",
+                                "authenticated": ${authentication?.isAuthenticated ?: false},
+                                "exception": "${authException.javaClass.simpleName}",
+                                "exceptionMessage": "$exceptionMessage"
+                              }
+                            }
+                            """.trimIndent(),
                         )
-                    }.accessDeniedHandler { _, response, _ ->
+                    }.accessDeniedHandler { request, response, accessDeniedException ->
+
+                        // TEMPORARY DEBUG LOGGING
+                        println("========================================")
+                        println("ACCESS DENIED")
+                        println("Method: ${request.method}")
+                        println("URI: ${request.requestURI}")
+                        println(
+                            "Authentication: " +
+                                SecurityContextHolder
+                                    .getContext()
+                                    .authentication,
+                        )
+                        println(
+                            "Exception: " +
+                                accessDeniedException.javaClass.name,
+                        )
+                        println(
+                            "Message: " +
+                                (accessDeniedException.message ?: "null"),
+                        )
+                        println("========================================")
+
                         response.status = HttpServletResponse.SC_FORBIDDEN
                         response.contentType = MediaType.APPLICATION_JSON_VALUE
                         response.characterEncoding = "UTF-8"
 
                         response.writer.write(
-                            """{"status":403,"message":"Недостаточно прав"}""",
+                            """
+                            {
+                              "status": 403,
+                              "message": "Недостаточно прав",
+                              "debug": {
+                                "method": "${request.method}",
+                                "uri": "${request.requestURI}",
+                                "exception": "${accessDeniedException.javaClass.simpleName}"
+                              }
+                            }
+                            """.trimIndent(),
                         )
                     }
             }
