@@ -11,6 +11,7 @@ import RegisterPage from "./pages/register/RegisterPage";
 import NotFound from "./pages/not-found/NotFound";
 import HomePage from "./pages/home/HomePage";
 import ReviewPage from "./pages/review/ReviewPage";
+import AnswerPage from "./pages/answer/AnswerPage";
 
 export default function App() {
   return (
@@ -46,6 +47,11 @@ export default function App() {
         <Route
           path="/review"
           element={<ReviewPage />}
+        />
+
+        <Route
+          path="/answers"
+          element={<AnswerPage />}
         />
 
         <Route

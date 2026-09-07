@@ -6,13 +6,23 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      <button
-        type="button"
-        className={styles.homeButton}
-        onClick={() => navigate("/home")}
-      >
-        HOME
-      </button>
+      <div className={styles.navigation}>
+        <button
+          type="button"
+          className={styles.navButton}
+          onClick={() => navigate("/home")}
+        >
+          HOME
+        </button>
+
+        <button
+          type="button"
+          className={styles.navButton}
+          onClick={() => navigate("/answers")}
+        >
+          ANSWERS
+        </button>
+      </div>
 
       <div className={styles.version}>
         v0.8

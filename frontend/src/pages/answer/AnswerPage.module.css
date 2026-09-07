@@ -1,0 +1,188 @@
+.page {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+  box-sizing: border-box;
+}
+
+.header {
+  margin-bottom: 48px;
+}
+
+.eyebrow {
+  margin-bottom: 8px;
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+}
+
+.header h1 {
+  margin: 0;
+
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #111827;
+}
+
+.header p {
+  margin: 12px 0 0;
+
+  font-size: 15px;
+  line-height: 1.5;
+  color: #6b7280;
+}
+
+.answersSection h2 {
+  margin: 0 0 16px;
+
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+}
+
+.answerList {
+  display: flex;
+  flex-direction: column;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.answer {
+  padding: 24px 8px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.answerHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.question {
+  min-width: 0;
+
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: #111827;
+}
+
+.score {
+  flex-shrink: 0;
+
+  min-width: 48px;
+  padding: 7px 10px;
+
+  border-radius: 8px;
+
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.scoreGood {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.scoreMedium {
+  background: #fefce8;
+  color: #ca8a04;
+}
+
+.scoreBad {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.correctAnswer {
+  margin-top: 20px;
+  padding: 16px;
+
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.label {
+  margin-bottom: 8px;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+}
+
+.answerText {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+
+  margin-top: 16px;
+
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.message {
+  padding: 24px 8px;
+
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.error {
+  padding: 16px;
+
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+
+  background: #fef2f2;
+  color: #dc2626;
+
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 24px 16px 48px;
+  }
+
+  .header {
+    margin-bottom: 32px;
+  }
+
+  .answer {
+    padding: 20px 4px;
+  }
+
+  .answerHeader {
+    gap: 16px;
+  }
+
+  .question {
+    font-size: 16px;
+  }
+
+  .score {
+    min-width: 44px;
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .correctAnswer {
+    margin-top: 16px;
+    padding: 14px;
+  }
+}
