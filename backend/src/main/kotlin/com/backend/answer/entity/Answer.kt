@@ -10,6 +10,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import java.time.Duration
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -33,6 +34,16 @@ class Answer(
         foreignKey = ForeignKey(name = "fk_answers_card"),
     )
     var card: Card,
+    @Column(name = "user_answer")
+    var userAnswer: String?,
+    @Column(name = "ai_feedback")
+    var aiFeedback: String?,
+    @Column(name = "start_answer_time")
+    var startAnswerTime: LocalDateTime?,
+    @Column(name = "submission_time")
+    var submissionTime: LocalDateTime?,
+    @Column(name = "ai_processing_duration")
+    var aiProcessingDuration: Duration?,
     @Column(name = "score", nullable = false)
     var score: Int,
     @Column(name = "created_at", nullable = false)

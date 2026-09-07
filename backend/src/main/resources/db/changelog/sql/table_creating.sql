@@ -23,9 +23,20 @@ CREATE TABLE cards (
 
 CREATE TABLE answers (
     answer_id UUID PRIMARY KEY,
+
     user_id UUID NOT NULL,
     card_id UUID NOT NULL,
+
+    user_answer TEXT NOT NULL,
+    ai_feedback TEXT NOT NULL,
+
+    start_answer_time TIMESTAMP NOT NULL,
+    submission_time TIMESTAMP NOT NULL,
+
+    ai_processing_duration INTERVAL NOT NULL,
+
     score INTEGER NOT NULL,
+
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_answers_user
