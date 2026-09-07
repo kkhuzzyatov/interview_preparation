@@ -1,5 +1,6 @@
 package com.backend.answer.controller
 
+import com.backend.answer.controller.dto.AnswerHistoryResponse
 import com.backend.answer.controller.dto.AnswerRequest
 import com.backend.answer.controller.dto.AnswerResponse
 import com.backend.answer.controller.dto.RevealAnswerResponse
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -75,5 +77,22 @@ class AnswerController(
                 cardId = cardId,
                 principal = principal,
             ),
+        )
+
+    @Operation(summary = "Get all answers of the authenticated user")
+    @ApiResponses(
+        ApiResponse(
+            responseCode = AnswerApiCodes.OK,
+            description = AnswerApiMessages.OK,
+        ),
+        ApiResponse(
+            responseCode = AnswerApiCodes.UNAUTHORIZED,
+            description = AnswerApiMessages.UNAUTHORIZED,
+        ),
+    )
+    @GetMapping
+    fun getAll(principal: Principal): ResponseEntity<List<AnswerHistoryResponse>> =
+        ResponseEntity.ok(
+            answerService.getAll(principal),
         )
 }

@@ -6,4 +6,6 @@ import java.util.UUID
 
 interface AnswerRepository : JpaRepository<Answer, UUID> {
     fun findByCardIdOrderByCreatedAtDesc(cardId: UUID): List<Answer>
+
+    fun findByUserIdOrderByCreatedAtDesc(userId: UUID): List<Answer>
 }

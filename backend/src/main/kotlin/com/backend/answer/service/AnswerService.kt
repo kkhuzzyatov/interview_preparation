@@ -1,5 +1,6 @@
 package com.backend.answer.service
 
+import com.backend.answer.controller.dto.AnswerHistoryResponse
 import com.backend.answer.controller.dto.AnswerRequest
 import com.backend.answer.controller.dto.AnswerResponse
 import com.backend.answer.controller.dto.RevealAnswerResponse
@@ -89,6 +90,24 @@ class AnswerService(
         return RevealAnswerResponse(
             correctAnswer = card.answer,
         )
+    }
+
+    @Transactional(readOnly = true)
+    fun getAll(principal: Principal): List<AnswerHistoryResponse> {
+        val user = getUser(principal)
+
+        return answerRepository
+            .findByUserIdOrderByCreatedAtDesc(user.id)
+            .map { answer ->
+                AnswerHistoryResponse(
+                    id = answer.id,
+                    cardId = answer.card.id,
+                    question = answer.card.question,
+                    correctAnswer = answer.card.answer,
+                    score = answer.score,
+                    createdAt = answer.createdAt,
+                )
+            }
     }
 
     private fun getUser(principal: Principal) =
