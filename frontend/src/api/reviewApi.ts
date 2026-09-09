@@ -61,18 +61,25 @@ function getAuthHeaders(
   return headers;
 }
 
-export async function getNextReviewCard(): Promise<ReviewCardResponse> {
+export interface NextCardRequest {
+  deskIds: string[];
+}
+
+export async function getNextReviewCard(
+  deskIds: string[]
+): Promise<ReviewCardResponse> {
   const response = await fetch(
     API_BASE_URL + API_ENDPOINTS.review.next,
     {
-      method: "GET",
-      headers: getAuthHeaders(),
+      method: "POST",
+      headers: getAuthHeaders("application/json"),
+      body: JSON.stringify({
+        deskIds,
+      }),
     }
   );
 
-  return handleResponse<ReviewCardResponse>(
-    response
-  );
+  return handleResponse<ReviewCardResponse>(response);
 }
 
 export async function startAnswer(

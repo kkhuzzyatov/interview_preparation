@@ -26,7 +26,10 @@ class ReviewService(
     private val multiplierService: ReviewMultiplierCalculator,
     private val clock: Clock,
 ) {
-    fun getNextCard(principal: Principal): Card {
+    fun getNextCard(
+        principal: Principal,
+        deskIds: Collection<UUID>,
+    ): Card {
         val userId = UUID.fromString(principal.name)
 
         val user =
@@ -38,25 +41,7 @@ class ReviewService(
                     )
                 }
 
-        /*
-         * Do not allow another question while the user already
-         * has an answer in progress.
-         */
-        val existingProcessing =
-            answerProcessingRepository.findByUserId(user.id)
-
-        if (existingProcessing != null) {
-            return cardRepository
-                .findById(existingProcessing.cardId)
-                .orElseThrow {
-                    IllegalStateException(
-                        "Card ${existingProcessing.cardId} for answer " +
-                            "${existingProcessing.answerId} does not exist",
-                    )
-                }
-        }
-
-        val cards = cardRepository.findAll()
+        val cards = cardRepository.findByDeskIdIn(deskIds)
 
         if (cards.isEmpty()) {
             throw NoCardsAvailableException()
@@ -65,19 +50,15 @@ class ReviewService(
         val weightedCards =
             cards
                 .map { card ->
-                    val answers =
-                        answerRepository
-                            .findByCardIdOrderByCreatedAtDesc(card.id)
-
-                    val weight =
-                        calculateWeight(
-                            card = card,
-                            answers = answers,
-                        )
-
                     WeightedCard(
                         card = card,
-                        weight = weight,
+                        weight =
+                            calculateWeight(
+                                card = card,
+                                answers =
+                                    answerRepository
+                                        .findByCardIdOrderByCreatedAtDesc(card.id),
+                            ),
                     )
                 }.filter { it.weight > 0.0 }
 
@@ -87,27 +68,10 @@ class ReviewService(
 
         val card = selectRandomCard(weightedCards)
 
-        /*
-         * Create the temporary answer state as soon as the
-         * question is selected.
-         *
-         * Redis will contain:
-         *
-         * answer-processing:{answerId}
-         * answer-processing:user:{userId}
-         *
-         * with status = QUESTION_SENT.
-         */
-        val processing =
-            AnswerProcessing(
-                answerId = UUID.randomUUID(),
-                userId = user.id,
-                cardId = card.id,
-                startAnswerTime = Instant.now(clock),
-                status = AnswerProcessingStatus.QUESTION_SENT,
-            )
-
-        answerProcessingRepository.save(processing)
+        createAnswerProcessing(
+            userId = user.id,
+            cardId = card.id,
+        )
 
         return card
     }
@@ -162,5 +126,21 @@ class ReviewService(
 
         // Protect against floating-point rounding.
         return weightedCards.last().card
+    }
+
+    private fun createAnswerProcessing(
+        userId: UUID,
+        cardId: UUID,
+    ) {
+        val processing =
+            AnswerProcessing(
+                answerId = UUID.randomUUID(),
+                userId = userId,
+                cardId = cardId,
+                startAnswerTime = Instant.now(clock),
+                status = AnswerProcessingStatus.QUESTION_SENT,
+            )
+
+        answerProcessingRepository.save(processing)
     }
 }

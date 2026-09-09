@@ -2,12 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import styles from "./HomePage.module.css";
 import {
-  API_BASE_URL,
-  API_ENDPOINTS,
-} from "../../config/api";
+  getAllDesks,
+  getDeskStatistics,
+} from "../../api/deskApi";
 
 export default function HomePage() {
   const navigate = useNavigate();
+
   const [desks, setDesks] = useState([]);
   const [statistics, setStatistics] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,46 +20,11 @@ export default function HomePage() {
         setLoading(true);
         setError("");
 
-        const token = localStorage.getItem("token");
-
-        const headers = {};
-
-        if (token) {
-          headers.Authorization = "Bearer " + token;
-        }
-
-        const desksResponse = await fetch(
-          API_BASE_URL + API_ENDPOINTS.desks.all,
-          {
-            method: "GET",
-            headers: headers,
-          }
-        );
-
-        if (!desksResponse.ok) {
-          throw new Error("Failed to load desks");
-        }
-
-        const statisticsResponse = await fetch(
-          API_BASE_URL +
-            API_ENDPOINTS.desks.statistics,
-          {
-            method: "GET",
-            headers: headers,
-          }
-        );
-
-        if (!statisticsResponse.ok) {
-          throw new Error(
-            "Failed to load desk statistics"
-          );
-        }
-
-        const desksData =
-          await desksResponse.json();
-
-        const statisticsData =
-          await statisticsResponse.json();
+        const [desksData, statisticsData] =
+          await Promise.all([
+            getAllDesks(),
+            getDeskStatistics(),
+          ]);
 
         setDesks(desksData);
         setStatistics(statisticsData);
@@ -76,13 +42,27 @@ export default function HomePage() {
     loadData();
   }, []);
 
-  function getDeskStatistics(deskId) {
-    const result = statistics.find(
-      (item) => item.deskId === deskId
-    );
+  function getDeskStatisticsForDesk(deskId) {
+    if (Array.isArray(statistics)) {
+      const result = statistics.find(
+        (item) => item.deskId === deskId
+      );
 
-    if (result) {
-      return result;
+      if (result) {
+        return result;
+      }
+    }
+
+    if (
+      statistics &&
+      typeof statistics === "object" &&
+      !Array.isArray(statistics)
+    ) {
+      const result = statistics[deskId];
+
+      if (result) {
+        return result;
+      }
     }
 
     return {
@@ -142,7 +122,7 @@ export default function HomePage() {
             <div className={styles.deskList}>
               {desks.map((desk) => {
                 const stats =
-                  getDeskStatistics(desk.id);
+                  getDeskStatisticsForDesk(desk.id);
 
                 const total =
                   stats.blue +
@@ -160,43 +140,23 @@ export default function HomePage() {
                     </div>
 
                     <div className={styles.stats}>
-                      <span
-                        className={
-                          styles.blue
-                        }
-                      >
+                      <span className={styles.blue}>
                         {stats.blue}
                       </span>
 
-                      <span
-                        className={
-                          styles.red
-                        }
-                      >
+                      <span className={styles.red}>
                         {stats.red}
                       </span>
 
-                      <span
-                        className={
-                          styles.yellow
-                        }
-                      >
+                      <span className={styles.yellow}>
                         {stats.yellow}
                       </span>
 
-                      <span
-                        className={
-                          styles.green
-                        }
-                      >
+                      <span className={styles.green}>
                         {stats.green}
                       </span>
 
-                      <span
-                        className={
-                          styles.total
-                        }
-                      >
+                      <span className={styles.total}>
                         ({total})
                       </span>
                     </div>

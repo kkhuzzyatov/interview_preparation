@@ -1,5 +1,6 @@
 package com.backend.review.controller
 
+import com.backend.review.controller.dto.NextCardRequest
 import com.backend.review.controller.dto.ReviewCardResponse
 import com.backend.review.service.ReviewService
 import io.swagger.v3.oas.annotations.Operation
@@ -7,7 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.security.Principal
@@ -30,9 +32,12 @@ class ReviewController(
             description = ReviewApiMessages.NOT_FOUND,
         ),
     )
-    @GetMapping("/next")
-    fun getNextCard(principal: Principal): ResponseEntity<ReviewCardResponse> {
-        val card = reviewService.getNextCard(principal)
+    @PostMapping("/next")
+    fun getNextCard(
+        principal: Principal,
+        @RequestBody request: NextCardRequest,
+    ): ResponseEntity<ReviewCardResponse> {
+        val card = reviewService.getNextCard(principal, request.deskIds)
 
         log
             .atInfo()

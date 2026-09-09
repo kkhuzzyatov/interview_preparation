@@ -6,4 +6,6 @@ import java.util.UUID
 
 interface CardRepository : JpaRepository<Card, UUID> {
     fun findByDeskId(deskId: UUID): List<Card>
+
+    fun findByDeskIdIn(deskIds: Collection<UUID>): List<Card>
 }
