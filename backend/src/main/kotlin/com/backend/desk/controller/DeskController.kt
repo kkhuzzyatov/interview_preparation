@@ -6,6 +6,7 @@ import com.backend.desk.service.DeskService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -18,13 +19,21 @@ import java.util.UUID
 class DeskController(
     private val deskService: DeskService,
 ) {
+    private val log = LoggerFactory.getLogger(DeskController::class.java)
+
     @Operation(summary = "Get all desks")
     @ApiResponse(
         responseCode = DeskApiCodes.OK,
         description = DeskApiMessages.OK,
     )
     @GetMapping
-    fun getAll(): ResponseEntity<List<DeskResponse>> = ResponseEntity.ok(deskService.getAll())
+    fun getAll(): ResponseEntity<List<DeskResponse>> {
+        log
+            .atInfo()
+            .log("Getting all desks")
+
+        return ResponseEntity.ok(deskService.getAll())
+    }
 
     @Operation(summary = "Get a desk with its cards")
     @ApiResponses(
@@ -40,5 +49,14 @@ class DeskController(
     @GetMapping("/{deskId}")
     fun getByIdWithCards(
         @PathVariable deskId: UUID,
-    ): ResponseEntity<DeskWithCardsResponse> = ResponseEntity.ok(deskService.getByIdWithCards(deskId))
+    ): ResponseEntity<DeskWithCardsResponse> {
+        log
+            .atInfo()
+            .addKeyValue("deskId", deskId)
+            .log("Getting desk with cards")
+
+        return ResponseEntity.ok(
+            deskService.getByIdWithCards(deskId),
+        )
+    }
 }

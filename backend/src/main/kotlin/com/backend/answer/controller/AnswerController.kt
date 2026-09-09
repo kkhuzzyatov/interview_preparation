@@ -8,6 +8,7 @@ import com.backend.answer.service.AnswerService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -23,6 +24,8 @@ import java.util.UUID
 class AnswerController(
     private val answerService: AnswerService,
 ) {
+    private val log = LoggerFactory.getLogger(AnswerController::class.java)
+
     @Operation(summary = "Evaluate an answer to a card")
     @ApiResponses(
         ApiResponse(
@@ -43,14 +46,21 @@ class AnswerController(
         principal: Principal,
         @PathVariable cardId: UUID,
         @RequestBody request: AnswerRequest,
-    ): ResponseEntity<AnswerResponse> =
-        ResponseEntity.ok(
+    ): ResponseEntity<AnswerResponse> {
+        log
+            .atInfo()
+            .addKeyValue("cardId", cardId)
+            .addKeyValue("principal", principal.name)
+            .log("Evaluating answer")
+
+        return ResponseEntity.ok(
             answerService.answer(
                 cardId = cardId,
                 request = request,
                 principal = principal,
             ),
         )
+    }
 
     @Operation(summary = "Reveal the correct answer without AI evaluation")
     @ApiResponses(
@@ -71,13 +81,20 @@ class AnswerController(
     fun reveal(
         principal: Principal,
         @PathVariable cardId: UUID,
-    ): ResponseEntity<RevealAnswerResponse> =
-        ResponseEntity.ok(
+    ): ResponseEntity<RevealAnswerResponse> {
+        log
+            .atInfo()
+            .addKeyValue("cardId", cardId)
+            .addKeyValue("principal", principal.name)
+            .log("Revealing answer")
+
+        return ResponseEntity.ok(
             answerService.reveal(
                 cardId = cardId,
                 principal = principal,
             ),
         )
+    }
 
     @Operation(summary = "Get all answers of the authenticated user")
     @ApiResponses(
@@ -91,8 +108,14 @@ class AnswerController(
         ),
     )
     @GetMapping
-    fun getAll(principal: Principal): ResponseEntity<List<AnswerHistoryResponse>> =
-        ResponseEntity.ok(
+    fun getAll(principal: Principal): ResponseEntity<List<AnswerHistoryResponse>> {
+        log
+            .atInfo()
+            .addKeyValue("principal", principal.name)
+            .log("Getting answer history")
+
+        return ResponseEntity.ok(
             answerService.getAll(principal),
         )
+    }
 }

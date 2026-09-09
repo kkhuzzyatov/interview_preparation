@@ -6,6 +6,7 @@ import com.backend.user.service.AuthService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(
     private val authService: AuthService,
 ) {
+    private val log = LoggerFactory.getLogger(AuthController::class.java)
+
     @Operation(summary = "Login")
     @ApiResponses(
         ApiResponse(
@@ -31,11 +34,17 @@ class AuthController(
     @PostMapping("/login")
     fun login(
         @RequestBody request: LoginRequest,
-    ): ResponseEntity<LoginResult> =
-        ResponseEntity.ok(
+    ): ResponseEntity<LoginResult> {
+        log
+            .atInfo()
+            .addKeyValue("email", request.email)
+            .log("Login attempt")
+
+        return ResponseEntity.ok(
             authService.login(
                 request.email,
                 request.password,
             ),
         )
+    }
 }
