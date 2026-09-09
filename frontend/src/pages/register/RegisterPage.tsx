@@ -1,48 +1,32 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  register,
-  login,
-} from "../../api/authApi";
+import { login } from "../../api/authApi";
+import { register } from "../../api/userApi";
 import styles from "./RegisterPage.module.css";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
 
-  const [email, setEmail] =
-    useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [password, setPassword] =
-    useState("");
-
-  const [confirmPassword, setConfirmPassword] =
-    useState("");
-
-  const [error, setError] =
-    useState("");
-
-  const [loading, setLoading] =
-    useState(false);
-
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(
     event: React.FormEvent
   ) {
     event.preventDefault();
 
-
     if (password !== confirmPassword) {
-      setError(
-        "Passwords do not match"
-      );
+      setError("Passwords do not match");
       return;
     }
-
 
     try {
       setError("");
       setLoading(true);
-
 
       // Create account
       await register({
@@ -50,14 +34,11 @@ export default function RegisterPage() {
         password,
       });
 
-
       // Automatically login after registration
-      const authResponse =
-        await login({
-          email,
-          password,
-        });
-
+      const authResponse = await login({
+        email,
+        password,
+      });
 
       if (!authResponse.token) {
         throw new Error(
@@ -65,54 +46,42 @@ export default function RegisterPage() {
         );
       }
 
-
       localStorage.setItem(
         "token",
         authResponse.token
       );
 
-
       navigate("/home", {
         replace: true,
       });
-
-
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
           : "Registration failed"
       );
-
     } finally {
       setLoading(false);
     }
   }
 
-
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-
         <div className={styles.header}>
-          <h1>
-            Create account
-          </h1>
+          <h1>Create account</h1>
 
           <p>
             Start learning questions today
           </p>
         </div>
 
-
         <form onSubmit={handleSubmit}>
-
           {error && (
             <div className={styles.error}>
               {error}
             </div>
           )}
-
 
           <div className={styles.field}>
             <label htmlFor="email">
@@ -125,14 +94,11 @@ export default function RegisterPage() {
               value={email}
               placeholder="Enter your email"
               onChange={(event) =>
-                setEmail(
-                  event.target.value
-                )
+                setEmail(event.target.value)
               }
               required
             />
           </div>
-
 
           <div className={styles.field}>
             <label htmlFor="password">
@@ -146,14 +112,11 @@ export default function RegisterPage() {
               placeholder="Create a password"
               minLength={6}
               onChange={(event) =>
-                setPassword(
-                  event.target.value
-                )
+                setPassword(event.target.value)
               }
               required
             />
           </div>
-
 
           <div className={styles.field}>
             <label htmlFor="confirmPassword">
@@ -174,7 +137,6 @@ export default function RegisterPage() {
             />
           </div>
 
-
           <button
             className={styles.primaryButton}
             type="submit"
@@ -185,19 +147,14 @@ export default function RegisterPage() {
               : "Create account"}
           </button>
 
-
           <button
             className={styles.secondaryButton}
             type="button"
-            onClick={() =>
-              navigate("/login")
-            }
+            onClick={() => navigate("/login")}
           >
             Already have an account
           </button>
-
         </form>
-
       </div>
     </div>
   );

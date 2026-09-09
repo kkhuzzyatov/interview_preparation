@@ -1,8 +1,10 @@
+import { useEffect, useState } from "react";
 import {
   BrowserRouter,
   Routes,
   Route,
   Navigate,
+  Outlet,
 } from "react-router-dom";
 
 import Header from "./components/header/Header";
@@ -12,6 +14,46 @@ import NotFound from "./pages/not-found/NotFound";
 import HomePage from "./pages/home/HomePage";
 import ReviewPage from "./pages/review/ReviewPage";
 import AnswerPage from "./pages/answer/AnswerPage";
+
+import { getCurrentUser } from "./api/userApi";
+
+function ProtectedRoute() {
+  const [authenticated, setAuthenticated] = useState(null);
+
+  useEffect(() => {
+    async function checkAuthentication() {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setAuthenticated(false);
+        return;
+      }
+
+      try {
+        await getCurrentUser(token);
+        setAuthenticated(true);
+      } catch {
+        localStorage.removeItem("token");
+        setAuthenticated(false);
+      }
+    }
+
+    checkAuthentication();
+  }, []);
+
+  // Authentication check is still in progress
+  if (authenticated === null) {
+    return null;
+  }
+
+  // User is not authenticated
+  if (!authenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // User is authenticated
+  return <Outlet />;
+}
 
 export default function App() {
   return (
@@ -39,20 +81,22 @@ export default function App() {
           element={<RegisterPage />}
         />
 
-        <Route
-          path="/home"
-          element={<HomePage />}
-        />
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="/home"
+            element={<HomePage />}
+          />
 
-        <Route
-          path="/review"
-          element={<ReviewPage />}
-        />
+          <Route
+            path="/review"
+            element={<ReviewPage />}
+          />
 
-        <Route
-          path="/answers"
-          element={<AnswerPage />}
-        />
+          <Route
+            path="/answers"
+            element={<AnswerPage />}
+          />
+        </Route>
 
         <Route
           path="*"

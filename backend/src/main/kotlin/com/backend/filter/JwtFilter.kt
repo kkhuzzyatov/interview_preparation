@@ -12,12 +12,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
+import java.io.IOException
+import java.util.UUID
 
 @Component
 class JwtFilter(
     private val jwtProvider: JwtProvider,
 ) : OncePerRequestFilter() {
-    @Throws(ServletException::class, java.io.IOException::class)
+    @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -27,23 +29,38 @@ class JwtFilter(
 
         if (header != null && header.startsWith("Bearer ")) {
             try {
-                val claims: Claims = jwtProvider.validate(header.substring(7))
+                val token = header.substring(7)
+                val claims: Claims = jwtProvider.validate(token)
 
-                val userId = claims.subject
+                val userId = UUID.fromString(claims.subject)
                 val role = claims.get("role", String::class.java)
+
+                val authorities =
+                    if (role != null) {
+                        listOf(
+                            SimpleGrantedAuthority("ROLE_$role"),
+                        )
+                    } else {
+                        emptyList()
+                    }
 
                 val auth =
                     UsernamePasswordAuthenticationToken(
                         userId,
                         null,
-                        listOf(SimpleGrantedAuthority("ROLE_$role")),
+                        authorities,
                     )
 
                 auth.details = claims
 
-                SecurityContextHolder.getContext().authentication = auth
+                SecurityContextHolder
+                    .getContext()
+                    .authentication = auth
             } catch (e: JwtException) {
-                // Invalid JWT — continue without authentication.
+                SecurityContextHolder.clearContext()
+            } catch (e: IllegalArgumentException) {
+                // Invalid UUID in JWT subject
+                SecurityContextHolder.clearContext()
             }
         }
 

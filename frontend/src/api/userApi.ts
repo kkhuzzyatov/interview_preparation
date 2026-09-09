@@ -3,13 +3,14 @@ import {
   API_ENDPOINTS,
 } from "../config/api";
 
-export interface LoginRequest {
+export interface RegisterRequest {
   email: string;
   password: string;
 }
 
-export interface AuthResponse {
-  token: string;
+export interface User {
+  id: string;
+  email: string;
 }
 
 async function handleResponse<T>(
@@ -38,11 +39,11 @@ async function handleResponse<T>(
   return response.json();
 }
 
-export async function login(
-  data: LoginRequest
-): Promise<AuthResponse> {
+export async function register(
+  data: RegisterRequest
+): Promise<User> {
   const response = await fetch(
-    `${API_BASE_URL}${API_ENDPOINTS.auth.login}`,
+    `${API_BASE_URL}${API_ENDPOINTS.user.register}`,
     {
       method: "POST",
       headers: {
@@ -52,5 +53,21 @@ export async function login(
     }
   );
 
-  return handleResponse<AuthResponse>(response);
+  return handleResponse<User>(response);
+}
+
+export async function getCurrentUser(
+  token: string
+): Promise<User> {
+  const response = await fetch(
+    `${API_BASE_URL}${API_ENDPOINTS.user.current}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return handleResponse<User>(response);
 }
