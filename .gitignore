@@ -13,9 +13,9 @@ out/
 .gradle/
 **/build/
 
-# Keep project build scripts
+### bash utils
+*.sh
 !build.sh
-!**/build.sh
 
 # =========================
 # Android
