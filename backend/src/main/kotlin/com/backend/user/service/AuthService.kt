@@ -16,6 +16,15 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtProvider: JwtProvider,
 ) {
+    private val animalNames =
+        listOf(
+            "Cat",
+            "Lion",
+            "Tiger",
+            "Elephant",
+            "Giraffe",
+        )
+
     fun register(
         email: String,
         password: String,
@@ -27,11 +36,19 @@ class AuthService(
         val user =
             User(
                 id = UUID.randomUUID(),
+                username = generateUsername(),
                 email = email,
                 passwordHash = requireNotNull(passwordEncoder.encode(password)),
             )
 
         return userRepository.save(user)
+    }
+
+    private fun generateUsername(): String {
+        val animal = animalNames.random()
+        val number = userRepository.count() + 1
+
+        return "$animal$number"
     }
 
     fun login(

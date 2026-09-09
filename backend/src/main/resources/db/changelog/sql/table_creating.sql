@@ -1,5 +1,6 @@
 CREATE TABLE users (
     user_id UUID PRIMARY KEY,
+    username VARCHAR(64) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL
 );
@@ -13,19 +14,15 @@ CREATE TABLE cards (
     card_id UUID PRIMARY KEY,
     question TEXT NOT NULL,
     answer TEXT NOT NULL,
-    desk_id UUID NOT NULL,
-    meet_chance DECIMAL(10, 2) NOT NULL,
-    CONSTRAINT fk_cards_desk
-        FOREIGN KEY (desk_id)
-        REFERENCES desks(desk_id)
-        ON DELETE CASCADE
+    desk_id UUID NOT NULL REFERENCES desks(desk_id) ON DELETE CASCADE,
+    meet_chance DECIMAL(10, 2) NOT NULL
 );
 
 CREATE TABLE answers (
     answer_id UUID PRIMARY KEY,
 
-    user_id UUID NOT NULL,
-    card_id UUID NOT NULL,
+    user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    card_id UUID NOT NULL REFERENCES cards(card_id) ON DELETE CASCADE,
 
     user_answer TEXT NOT NULL,
     ai_feedback TEXT NOT NULL,
@@ -37,15 +34,5 @@ CREATE TABLE answers (
 
     score INTEGER NOT NULL,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_answers_user
-        FOREIGN KEY (user_id)
-        REFERENCES users(user_id)
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_answers_card
-        FOREIGN KEY (card_id)
-        REFERENCES cards(card_id)
-        ON DELETE CASCADE
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
