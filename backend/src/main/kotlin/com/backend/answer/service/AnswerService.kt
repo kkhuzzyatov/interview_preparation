@@ -139,13 +139,18 @@ class AnswerService(
         val user = getUser(principal)
         val card = getCard(cardId)
 
-        val processing =
-            answerProcessingRepository.findByUserId(user.id)
+        val processing = answerProcessingRepository.findByUserId(user.id)
 
         if (processing != null) {
             check(processing.cardId == cardId) {
                 "Answer does not belong to card $cardId"
             }
+
+            saveRevealedAnswer(
+                processing = processing,
+                user = user,
+                card = card,
+            )
 
             answerProcessingRepository.deleteByAnswerId(
                 processing.answerId,
@@ -229,6 +234,35 @@ class AnswerService(
                     "Authenticated user ${principal.name} does not exist",
                 )
             }
+
+    private fun saveRevealedAnswer(
+        processing: AnswerProcessing,
+        user: User,
+        card: Card,
+    ) {
+        val revealTime = Instant.now(clock)
+
+        answerRepository.save(
+            Answer(
+                id = processing.answerId,
+                user = user,
+                card = card,
+                userAnswer = "The answer was revealed.",
+                aiFeedback = "The answer was revealed.",
+                startAnswerTime =
+                    processing.startAnswerTime
+                        .atZone(clock.zone)
+                        .toLocalDateTime(),
+                submissionTime =
+                    revealTime
+                        .atZone(clock.zone)
+                        .toLocalDateTime(),
+                aiProcessingDurationMs = 0,
+                score = 0,
+                createdAt = LocalDateTime.now(clock),
+            ),
+        )
+    }
 
     private fun getCard(cardId: UUID): Card =
         cardRepository
