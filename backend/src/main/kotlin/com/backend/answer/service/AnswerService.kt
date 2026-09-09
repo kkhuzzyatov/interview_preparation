@@ -70,8 +70,12 @@ class AnswerService(
 
         val processing =
             answerProcessingRepository.findByUserId(user.id)
-                ?: error(
-                    "No answer in progress for user ${user.id}",
+                ?: AnswerProcessing(
+                    answerId = UUID.randomUUID(),
+                    userId = user.id,
+                    cardId = card.id,
+                    startAnswerTime = Instant.now(clock),
+                    status = AnswerProcessingStatus.QUESTION_SENT,
                 )
 
         validateProcessing(
