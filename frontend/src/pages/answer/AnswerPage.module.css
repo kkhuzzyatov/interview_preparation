@@ -36,13 +36,72 @@
   color: #6b7280;
 }
 
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 16px;
+}
+
 .answersSection h2 {
-  margin: 0 0 16px;
+  margin: 0;
 
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: #6b7280;
+}
+
+.count {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin-bottom: 20px;
+}
+
+.filterButton {
+  padding: 7px 12px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+
+  background: #ffffff;
+  color: #6b7280;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.filterButton:hover {
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.filterButtonActive {
+  border-color: #111827;
+  background: #111827;
+  color: #ffffff;
+}
+
+.filterButtonActive:hover {
+  border-color: #111827;
+  background: #111827;
+  color: #ffffff;
 }
 
 .answerList {
@@ -53,37 +112,96 @@
 }
 
 .answer {
-  padding: 24px 8px;
-
   border-bottom: 1px solid #e5e7eb;
+}
+
+.answerExpanded {
+  background: #ffffff;
+}
+
+.answerToggle {
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+
+  padding: 16px 36px 16px 8px;
+
+  border: 0;
+  background: transparent;
+
+  text-align: left;
+  font: inherit;
+
+  cursor: pointer;
+}
+
+.answerToggle:hover {
+  background: #f9fafb;
 }
 
 .answerHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  width: 100%;
+
   gap: 24px;
 }
 
-.question {
+.questionBlock {
   min-width: 0;
+  flex: 1;
+}
 
-  font-size: 17px;
-  line-height: 1.5;
-  font-weight: 700;
+.question {
+  overflow-wrap: anywhere;
+
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 600;
   color: #111827;
+}
+
+.collapsedMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  margin-top: 8px;
+
+  font-size: 12px;
+  line-height: 1.4;
+  color: #9ca3af;
+}
+
+.deskBadge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 3px 8px;
+
+  border-radius: 999px;
+
+  background: #f3f4f6;
+  color: #4b5563;
+
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .score {
   flex-shrink: 0;
 
   min-width: 48px;
-  padding: 7px 10px;
+  padding: 6px 9px;
 
-  border-radius: 8px;
+  border-radius: 7px;
 
   text-align: center;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -100,6 +218,45 @@
 .scoreBad {
   background: #fef2f2;
   color: #dc2626;
+}
+
+.expandIcon {
+  position: absolute;
+  top: 18px;
+  right: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 18px;
+  height: 18px;
+
+  border-radius: 50%;
+
+  color: #9ca3af;
+
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+
+  transition: transform 0.15s ease;
+}
+
+.expandIconExpanded {
+  transform: rotate(45deg);
+}
+
+.answerContent {
+  padding: 0 8px 24px;
+}
+
+.userAnswer {
+  margin-top: 4px;
+}
+
+.feedback {
+  margin-top: 20px;
 }
 
 .correctAnswer {
@@ -120,9 +277,27 @@
 }
 
 .answerText {
+  overflow-wrap: anywhere;
+
   font-size: 14px;
   line-height: 1.6;
   color: #374151;
+}
+
+.metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+
+  margin-top: 20px;
+
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.metadata span {
+  color: #6b7280;
+  font-weight: 600;
 }
 
 .footer {
@@ -163,26 +338,52 @@
     margin-bottom: 32px;
   }
 
-  .answer {
-    padding: 20px 4px;
+  .filters {
+    margin-bottom: 16px;
+  }
+
+  .filterButton {
+    padding: 6px 10px;
+  }
+
+  .answerToggle {
+    padding: 14px 32px 14px 4px;
   }
 
   .answerHeader {
-    gap: 16px;
+    gap: 12px;
   }
 
   .question {
-    font-size: 16px;
+    font-size: 14px;
+  }
+
+  .collapsedMeta {
+    gap: 8px;
   }
 
   .score {
     min-width: 44px;
     padding: 6px 8px;
-    font-size: 13px;
+    font-size: 12px;
+  }
+
+  .expandIcon {
+    top: 16px;
+    right: 4px;
+  }
+
+  .answerContent {
+    padding: 0 4px 20px;
   }
 
   .correctAnswer {
     margin-top: 16px;
     padding: 14px;
+  }
+
+  .metadata {
+    flex-direction: column;
+    gap: 8px;
   }
 }

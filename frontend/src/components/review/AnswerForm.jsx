@@ -11,8 +11,14 @@ export default function AnswerForm({
   error,
 }) {
   return (
-    <form className={styles.form} onSubmit={onSubmit}>
-      <label className={styles.label} htmlFor="answer">
+    <form
+      className={styles.form}
+      onSubmit={onSubmit}
+    >
+      <label
+        className={styles.label}
+        htmlFor="answer"
+      >
         Your answer
       </label>
 
@@ -20,22 +26,41 @@ export default function AnswerForm({
         id="answer"
         className={styles.textarea}
         value={answer}
-        onChange={(event) => onAnswerChange(event.target.value)}
+        onChange={(event) =>
+          onAnswerChange(event.target.value)
+        }
         placeholder="Your answer"
         rows={8}
         required
         disabled={isProcessing}
       />
 
-      {error && <div className={styles.error}>{error}</div>}
+      {error && (
+        <div className={styles.error}>
+          {error}
+        </div>
+      )}
+
+      {isProcessing && (
+        <div className={styles.message}>
+          {submitting
+            ? "Submitting your answer..."
+            : "AI is evaluating your answer..."}
+        </div>
+      )}
 
       <div className={styles.actions}>
         <button
           className={styles.submitButton}
           type="submit"
-          disabled={isProcessing || !answer.trim()}
+          disabled={
+            isProcessing ||
+            !answer.trim()
+          }
         >
-          {submitting ? "Submitting..." : "Submit"}
+          {submitting
+            ? "Submitting..."
+            : "Submit"}
         </button>
 
         <button
@@ -44,7 +69,9 @@ export default function AnswerForm({
           onClick={onReveal}
           disabled={isProcessing}
         >
-          {revealing ? "Revealing..." : "Reveal answer"}
+          {revealing
+            ? "Revealing..."
+            : "Reveal answer"}
         </button>
       </div>
     </form>

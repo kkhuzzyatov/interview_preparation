@@ -33,7 +33,7 @@ CREATE TABLE answers (
     start_answer_time TIMESTAMP NOT NULL,
     submission_time TIMESTAMP NOT NULL,
 
-    ai_processing_duration INTERVAL NOT NULL,
+    ai_processing_duration_ms BIGINT NOT NULL,
 
     score INTEGER NOT NULL,
 

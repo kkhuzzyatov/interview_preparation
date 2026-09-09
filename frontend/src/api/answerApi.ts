@@ -8,8 +8,15 @@ export interface AnswerHistoryResponse {
   cardId: string;
   question: string;
   correctAnswer: string;
+  userAnswer: string | null;
+  aiFeedback: string | null;
   score: number;
+  startAnswerTime: string | null;
+  submissionTime: string | null;
+  aiProcessingDurationMs: number | null;
   createdAt: string;
+  deskId: string;
+  deskName: string;
 }
 
 async function handleResponse<T>(
@@ -50,6 +57,28 @@ function getAuthHeaders(): Record<string, string> {
   }
 
   return headers;
+}
+
+export async function startAnswer(
+  cardId: string
+): Promise<void> {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error(
+      "Неавторизован или токен истёк"
+    );
+  }
+
+  const response = await fetch(
+    API_BASE_URL + API_ENDPOINTS.answer.start(cardId),
+    {
+      method: "POST",
+      headers: getAuthHeaders(),
+    }
+  );
+
+  await handleResponse<void>(response);
 }
 
 export async function getAllAnswers(): Promise<

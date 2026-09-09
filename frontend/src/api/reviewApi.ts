@@ -75,6 +75,21 @@ export async function getNextReviewCard(): Promise<ReviewCardResponse> {
   );
 }
 
+export async function startAnswer(
+  cardId: string
+): Promise<void> {
+  const response = await fetch(
+    API_BASE_URL +
+      API_ENDPOINTS.answer.start(cardId),
+    {
+      method: "POST",
+      headers: getAuthHeaders(),
+    }
+  );
+
+  await handleResponse<unknown>(response);
+}
+
 export async function submitAnswer(
   cardId: string,
   answer: string
@@ -108,15 +123,7 @@ export async function revealAnswer(
     }
   );
 
-  const data =
-    await handleResponse<RevealAnswerResponse>(
-      response
-    );
-
-  console.log(
-    "Reveal response from server:",
-    data
+  return handleResponse<RevealAnswerResponse>(
+    response
   );
-
-  return data;
 }
