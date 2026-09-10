@@ -14,6 +14,7 @@ import NotFound from "./pages/not-found/NotFound";
 import HomePage from "./pages/home/HomePage";
 import ReviewPage from "./pages/review/ReviewPage";
 import AnswerPage from "./pages/answer/AnswerPage";
+import LeaderboardPage from "./pages/leaderboard/LeaderboardPage";
 
 import { getCurrentUser } from "./api/userApi";
 
@@ -95,6 +96,11 @@ export default function App() {
           <Route
             path="/answers"
             element={<AnswerPage />}
+          />
+
+          <Route
+            path="/leaderboard"
+            element={<LeaderboardPage />}
           />
         </Route>
 

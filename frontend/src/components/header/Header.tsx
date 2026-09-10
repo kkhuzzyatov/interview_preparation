@@ -22,6 +22,14 @@ export default function Header() {
         >
           ANSWERS
         </button>
+
+        <button
+          type="button"
+          className={styles.navButton}
+          onClick={() => navigate("/leaderboard")}
+        >
+          LEADERBOARD
+        </button>
       </div>
 
       <div className={styles.version}>

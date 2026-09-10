@@ -1,35 +1,41 @@
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ??
-  "http://localhost:8080/api";
+import.meta.env.VITE_API_BASE_URL ??
+"http://localhost:8080/api";
 
 export const API_ENDPOINTS = {
-  auth: {
-    login: "/auth/login",
-  },
+    auth: {
+        login: "/auth/login",
+    },
 
-  user: {
-    register: "/user",
-    current: "/user",
-  },
+    user: {
+        register: "/user",
+        current: "/user",
+    },
 
-  answer: {
-    evaluate: (cardId: string) =>
-      `/answer/${cardId}`,
+    answer: {
+        evaluate: (cardId: string) =>
+        `/answer/${cardId}`,
 
-    reveal: (cardId: string) =>
-      `/answer/${cardId}/reveal`,
+        reveal: (cardId: string) =>
+        `/answer/${cardId}/reveal`,
 
-    all: "/answer",
-  },
+        all: "/answer",
+    },
 
-  review: {
-    next: "/review/next",
-  },
+    review: {
+        next: "/review/next",
+    },
 
-  desks: {
-    all: "/desks",
-    byId: (deskId: string) =>
-      `/desks/${deskId}`,
-    statistics: "/desks/statistics",
-  },
+    desks: {
+        all: "/desks",
+        byId: (deskId: string) =>
+        `/desks/${deskId}`,
+        statistics: "/desks/statistics",
+    },
+
+    leaderboard: {
+        day: "/leaderboard/day",
+        week: "/leaderboard/week",
+        allTime: "/leaderboard/all-time",
+    },
 };
