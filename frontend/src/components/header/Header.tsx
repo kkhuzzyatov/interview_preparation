@@ -33,7 +33,7 @@ export default function Header() {
       </div>
 
       <div className={styles.version}>
-        v0.8
+        v1.0
       </div>
     </header>
   );

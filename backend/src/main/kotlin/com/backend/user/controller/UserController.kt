@@ -40,11 +40,13 @@ class UserController(
     ): ResponseEntity<User> {
         log
             .atInfo()
+            .addKeyValue("username", request.username)
             .addKeyValue("email", request.email)
             .log("User registration attempt")
 
         return ResponseEntity.ok(
             authService.register(
+                request.username,
                 request.email,
                 request.password,
             ),

@@ -7,6 +7,7 @@ import styles from "./RegisterPage.module.css";
 export default function RegisterPage() {
   const navigate = useNavigate();
 
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -30,6 +31,7 @@ export default function RegisterPage() {
 
       // Create account
       await register({
+        username,
         email,
         password,
       });
@@ -82,6 +84,23 @@ export default function RegisterPage() {
               {error}
             </div>
           )}
+
+          <div className={styles.field}>
+            <label htmlFor="username">
+              Username
+            </label>
+
+            <input
+              id="username"
+              type="text"
+              value={username}
+              placeholder="Choose a username"
+              onChange={(event) =>
+                setUsername(event.target.value)
+              }
+              required
+            />
+          </div>
 
           <div className={styles.field}>
             <label htmlFor="email">
