@@ -5,9 +5,15 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE topics (
+    topic_id UUID PRIMARY KEY,
+    name VARCHAR(64) NOT NULL UNIQUE
+);
+
 CREATE TABLE desks (
     desk_id UUID PRIMARY KEY,
-    name VARCHAR(64) NOT NULL
+    name VARCHAR(64) NOT NULL,
+    topic_id UUID NOT NULL REFERENCES topics(topic_id) ON DELETE CASCADE
 );
 
 CREATE TABLE cards (

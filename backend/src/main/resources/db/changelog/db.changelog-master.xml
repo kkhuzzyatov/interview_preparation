@@ -16,7 +16,7 @@
 
     <changeSet id="2" author="kamil">
         <sqlFile
-                path="sql/desks_insert.sql"
+                path="sql/java_topics_insert.sql"
                 relativeToChangelogFile="true"
                 splitStatements="true"
                 stripComments="true"/>
@@ -24,7 +24,15 @@
 
     <changeSet id="3" author="kamil">
         <sqlFile
-                path="sql/insert_cards.sql"
+                path="sql/java_desks_insert.sql"
+                relativeToChangelogFile="true"
+                splitStatements="true"
+                stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="4" author="kamil">
+        <sqlFile
+                path="sql/java_cards_insert.sql"
                 relativeToChangelogFile="true"
                 splitStatements="true"
                 stripComments="true"/>
