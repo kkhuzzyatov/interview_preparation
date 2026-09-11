@@ -7,4 +7,5 @@ data class OpenAiProperties(
     val baseUrl: String,
     val apiKey: String,
     val model: String,
+    val improvementModel: String,
 )

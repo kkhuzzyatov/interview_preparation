@@ -367,9 +367,12 @@ export default function AnswerPage() {
 
                           <div>
                             <span>AI processing:</span>{" "}
-                            {formatDuration(
-                              answer.aiProcessingDurationMs
-                            )}
+                            {formatDuration(answer.aiProcessingDurationMs)}
+                          </div>
+
+                          <div>
+                            <span>Card ID:</span>{" "}
+                            {answer.cardId ?? "—"}
                           </div>
                         </div>
 

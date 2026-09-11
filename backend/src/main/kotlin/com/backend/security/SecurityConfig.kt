@@ -179,7 +179,10 @@ class SecurityConfig(
                 allowedOrigins =
                     listOf(
                         frontendProperties.url,
-                        "http://localhost:5173",
+                        "http://www.interview-preparation.ru",
+                        "https://www.interview-preparation.ru",
+                        "http://interview-preparation.ru",
+                        "https://interview-preparation.ru",
                     )
 
                 allowedMethods =
