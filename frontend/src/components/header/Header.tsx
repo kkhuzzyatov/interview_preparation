@@ -10,7 +10,7 @@ export default function Header() {
         <button
           type="button"
           className={styles.navButton}
-          onClick={() => navigate("/home")}
+          onClick={() => navigate("/")}
         >
           HOME
         </button>

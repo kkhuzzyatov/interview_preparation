@@ -32,7 +32,7 @@ export default function LoginPage() {
         response.token
       );
 
-      navigate("/home");
+      navigate("/");
 
     } catch (err) {
       setError(

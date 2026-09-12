@@ -22,7 +22,7 @@ export default function NotFound() {
 
         <button
           className={styles.button}
-          onClick={() => navigate("/home")}
+          onClick={() => navigate("/")}
         >
           Back to Home
         </button>

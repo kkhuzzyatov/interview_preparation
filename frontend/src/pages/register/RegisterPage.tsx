@@ -53,7 +53,7 @@ export default function RegisterPage() {
         authResponse.token
       );
 
-      navigate("/home", {
+      navigate("/", {
         replace: true,
       });
     } catch (err) {
