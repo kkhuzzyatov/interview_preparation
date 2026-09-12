@@ -13,10 +13,7 @@ class CardImprovementService(
     private val openAiApiClient: OpenAiApiClient,
     private val adminProperties: AdminProperties,
 ) {
-
-    fun isValidAdminKey(key: String?): Boolean {
-        return key != null && key == adminProperties.cardsImprovementKey
-    }
+    fun isValidAdminKey(key: String?): Boolean = key != null && key == adminProperties.cardsImprovementKey
 
     fun improveAnswer(cardId: UUID): ImproveAnswerResponse {
         val card =

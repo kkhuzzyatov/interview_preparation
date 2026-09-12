@@ -1,13 +1,13 @@
-package com.backend.admin.controller
+package com.backend.card.controller
 
-object CardImprovementApiCodes {
+object CardApiCodes {
     const val OK = "200"
     const val UNAUTHORIZED = "401"
     const val NOT_FOUND = "404"
 }
 
-object CardImprovementApiMessages {
-    const val OK = "Answer improved successfully"
+object CardApiMessages {
+    const val OK = "Card updated successfully"
     const val UNAUTHORIZED = "Authentication is required"
     const val NOT_FOUND = "Card not found"
 }

@@ -1,9 +1,9 @@
 package com.backend.client
 
 import com.backend.properties.OpenAiProperties
-import tools.jackson.databind.ObjectMapper
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
+import tools.jackson.databind.ObjectMapper
 
 class OpenAiApiClient(
     private val restClient: RestClient,

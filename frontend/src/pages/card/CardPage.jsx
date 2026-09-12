@@ -4,6 +4,7 @@ import {
   getAllDesks,
   getDeskById,
 } from "../../api/deskApi";
+import CardItem from "../../components/card/CardItem";
 
 export default function CardsPage() {
   const [desks, setDesks] = useState([]);
@@ -11,7 +12,9 @@ export default function CardsPage() {
   const [cards, setCards] = useState([]);
 
   const [search, setSearch] = useState("");
-  const [expandedCards, setExpandedCards] = useState(new Set());
+  const [expandedCards, setExpandedCards] = useState(
+    new Set()
+  );
 
   const [loadingDesks, setLoadingDesks] = useState(true);
   const [loadingCards, setLoadingCards] = useState(false);
@@ -89,6 +92,16 @@ export default function CardsPage() {
 
       return next;
     });
+  }
+
+  function handleCardUpdated(updatedCard) {
+    setCards((previous) =>
+      previous.map((card) =>
+        card.id === updatedCard.id
+          ? updatedCard
+          : card
+      )
+    );
   }
 
   const filteredCards = useMemo(() => {
@@ -207,57 +220,17 @@ export default function CardsPage() {
         !loadingCards &&
         filteredCards.length > 0 && (
           <section className={styles.cardList}>
-            {filteredCards.map((card) => {
-              const isExpanded =
-                expandedCards.has(card.id);
-
-              return (
-                <article
-                  className={styles.card}
-                  key={card.id}
-                >
-                  <div className={styles.cardHeader}>
-                    <div className={styles.question}>
-                      {card.question}
-                    </div>
-
-                    <button
-                      type="button"
-                      className={`${styles.toggleButton} ${
-                        isExpanded
-                          ? styles.expanded
-                          : ""
-                      }`}
-                      onClick={() =>
-                        toggleCard(card.id)
-                      }
-                      aria-expanded={isExpanded}
-                      aria-label={
-                        isExpanded
-                          ? "Hide answer"
-                          : "Show answer"
-                      }
-                    >
-                      <span>+</span>
-                    </button>
-                  </div>
-
-                  {isExpanded && (
-                    <div className={styles.answer}>
-
-                      <div className={styles.answerText}>
-                        {card.answer}
-                      </div>
-
-                      <div className={styles.cardId}>
-                        <strong>Card ID:</strong>{" "}
-                        {card.id}
-                      </div>
-                    </div>
-                  )}
-                </article>
-              );
-            })}
+            {filteredCards.map((card) => (
+              <CardItem
+                key={card.id}
+                card={card}
+                isExpanded={expandedCards.has(card.id)}
+                onToggle={() =>
+                  toggleCard(card.id)
+                }
+                onUpdated={handleCardUpdated}
+              />
+            ))}
           </section>
         )}
     </main>

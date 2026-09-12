@@ -1,0 +1,247 @@
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+}
+
+.question {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #374151;
+  text-align: left;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* UPDATE */
+
+.updateButton {
+  padding: 7px 11px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.updateButton:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+.updateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* + button */
+
+.toggleButton {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.toggleButton:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.toggleButton span {
+  font-size: 20px;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.toggleButton.expanded span {
+  transform: rotate(45deg);
+}
+
+/* Answer */
+
+.answer {
+  margin: 0 8px 24px;
+  padding: 18px 20px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+.answerText {
+  max-width: 760px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #6b7280;
+  text-align: left;
+}
+
+.cardId {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #9ca3af;
+  text-align: left;
+}
+
+.cardId strong {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* Edit form */
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editLabel {
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  text-align: left;
+}
+
+.editInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #374151;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.editInput:focus {
+  outline: none;
+  border-color: #9ca3af;
+}
+
+.editError {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 12px;
+  text-align: left;
+}
+
+.editActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cancelButton,
+.saveButton {
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.cancelButton {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #6b7280;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: #f9fafb;
+}
+
+.saveButton {
+  border: 1px solid #374151;
+  background: #374151;
+  color: #ffffff;
+}
+
+.saveButton:hover:not(:disabled) {
+  background: #1f2937;
+}
+
+.cancelButton:disabled,
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .cardHeader {
+    padding: 16px;
+    gap: 10px;
+  }
+
+  .actions {
+    gap: 6px;
+  }
+
+  .updateButton {
+    padding: 6px 9px;
+    font-size: 10px;
+  }
+
+  .toggleButton {
+    width: 30px;
+    height: 30px;
+  }
+
+  .answer {
+    margin: 0 4px 20px;
+    padding: 16px 16px 14px;
+  }
+
+  .answerText {
+    font-size: 14px;
+  }
+}

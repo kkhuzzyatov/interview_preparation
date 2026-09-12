@@ -9,7 +9,6 @@ import tools.jackson.databind.ObjectMapper
 
 @Configuration
 class OpenAiClientConfig {
-
     @Bean
     fun openAiApiClient(
         restClient: RestClient,
