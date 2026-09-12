@@ -1,0 +1,297 @@
+.page {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+  box-sizing: border-box;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  margin-bottom: 8px;
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+}
+
+.header h1 {
+  margin: 0;
+
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Controls */
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  margin-bottom: 36px;
+}
+
+.selectWrapper,
+.searchWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+}
+
+.select,
+.search {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+
+  background: #ffffff;
+  color: #111827;
+
+  font-family: inherit;
+  font-size: 15px;
+
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.select:hover,
+.search:hover {
+  border-color: #9ca3af;
+}
+
+.select:focus,
+.search:focus {
+  border-color: #374151;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.07);
+}
+
+.select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.search::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+/* Cards */
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.card {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  min-height: 72px;
+  padding: 12px 8px;
+
+  box-sizing: border-box;
+}
+
+.question {
+  min-width: 0;
+
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 650;
+  color: #111827;
+}
+
+/* Question + Card ID */
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+
+  min-width: 0;
+}
+
+/* Expand button */
+
+.toggleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  width: 38px;
+  height: 38px;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 8px;
+
+  background: transparent;
+  color: #374151;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.toggleButton:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.toggleButton:active {
+  background: #e5e7eb;
+}
+
+.toggleButton span {
+  display: block;
+
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 300;
+
+  transition: transform 0.2s ease;
+}
+
+.toggleButton.expanded span {
+  transform: rotate(45deg);
+}
+
+/* Answer */
+
+.answer {
+  margin: 0 8px 24px;
+
+  padding: 18px 20px 16px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+.answerText {
+  max-width: 760px;
+
+  margin: 0;
+
+  font-size: 14px;
+  line-height: 1.65;
+  color: #6b7280;
+  text-align: left;
+}
+
+.cardId {
+  margin-top: 16px;
+
+  padding-top: 12px;
+
+  border-top: 1px solid #e5e7eb;
+
+  font-size: 12px;
+  line-height: 1.4;
+  color: #9ca3af;
+
+  text-align: left;
+}
+
+.cardId strong {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* Empty / Error */
+
+.emptyMessage {
+  padding: 24px 8px;
+
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.error {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+
+  background: #fef2f2;
+  color: #dc2626;
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .page {
+    padding: 24px 16px 48px;
+  }
+
+  .header {
+    margin-bottom: 24px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+  }
+
+  .controls {
+    grid-template-columns: 1fr;
+    gap: 14px;
+
+    margin-bottom: 28px;
+  }
+
+  .cardHeader {
+    gap: 12px;
+    padding: 12px 4px;
+  }
+
+  .question {
+    font-size: 15px;
+  }
+
+  .toggleButton {
+    width: 36px;
+    height: 36px;
+  }
+}

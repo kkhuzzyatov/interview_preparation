@@ -26,6 +26,14 @@ export default function Header() {
         <button
           type="button"
           className={styles.navButton}
+          onClick={() => navigate("/cards")}
+        >
+          CARDS
+        </button>
+
+        <button
+          type="button"
+          className={styles.navButton}
           onClick={() => navigate("/leaderboard")}
         >
           LEADERBOARD

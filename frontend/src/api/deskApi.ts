@@ -8,6 +8,16 @@ export interface DeskResponse {
   name: string;
 }
 
+export interface CardResponse {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+export interface DeskWithCardsResponse extends DeskResponse {
+  cards: CardResponse[];
+}
+
 export interface DeskStatisticsResponse {
   deskId: string;
   blue: number;
@@ -70,6 +80,20 @@ export async function getAllDesks(): Promise<DeskResponse[]> {
   );
 
   return handleResponse<DeskResponse[]>(response);
+}
+
+export async function getDeskById(
+  deskId: string
+): Promise<DeskWithCardsResponse> {
+  const response = await fetch(
+    API_BASE_URL + API_ENDPOINTS.desks.byId(deskId),
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
+
+  return handleResponse<DeskWithCardsResponse>(response);
 }
 
 export async function getDeskStatistics(): Promise<DeskStatisticsData> {

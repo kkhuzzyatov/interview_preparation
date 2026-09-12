@@ -1,6 +1,6 @@
 export const API_BASE_URL =
 import.meta.env.VITE_API_BASE_URL ??
-"http://144.31.213.133:8080/api";
+"http://localhost:8080/api";
 
 export const API_ENDPOINTS = {
     auth: {

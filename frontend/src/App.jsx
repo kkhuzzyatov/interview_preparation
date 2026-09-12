@@ -15,6 +15,7 @@ import HomePage from "./pages/home/HomePage";
 import ReviewPage from "./pages/review/ReviewPage";
 import AnswerPage from "./pages/answer/AnswerPage";
 import LeaderboardPage from "./pages/leaderboard/LeaderboardPage";
+import CardPage from "./pages/card/CardPage";
 
 import { getCurrentUser } from "./api/userApi";
 
@@ -91,6 +92,11 @@ export default function App() {
           <Route
             path="/leaderboard"
             element={<LeaderboardPage />}
+          />
+
+          <Route
+            path="/cards"
+            element={<CardPage />}
           />
         </Route>
 
