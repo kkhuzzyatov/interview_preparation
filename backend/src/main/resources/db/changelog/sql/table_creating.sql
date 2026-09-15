@@ -42,3 +42,21 @@ CREATE TABLE answers (
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE application_settings (
+    id BIGINT PRIMARY KEY,
+
+    answer_evaluation_prompt TEXT NOT NULL,
+
+    evaluation_red_average_score DOUBLE PRECISION NOT NULL,
+    evaluation_green_min_answers INTEGER NOT NULL,
+    evaluation_green_average_score DOUBLE PRECISION NOT NULL,
+
+    review_multiplier_recency_default_multiplier DOUBLE PRECISION NOT NULL,
+    review_multiplier_meet_chance_min DOUBLE PRECISION NOT NULL,
+    review_multiplier_meet_chance_max DOUBLE PRECISION NOT NULL,
+    review_multiplier_min_score INTEGER NOT NULL,
+    review_multiplier_max_score INTEGER NOT NULL,
+    review_multiplier_base_difficulty_multiplier DOUBLE PRECISION NOT NULL,
+    review_multiplier_default_difficulty_multiplier DOUBLE PRECISION NOT NULL
+);
