@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -16,6 +17,7 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/api/cards")
+@PreAuthorize("hasRole('ADMIN')")
 class CardController(
     private val cardService: CardService,
 ) {
@@ -28,6 +30,10 @@ class CardController(
         ApiResponse(
             responseCode = CardApiCodes.UNAUTHORIZED,
             description = CardApiMessages.UNAUTHORIZED,
+        ),
+        ApiResponse(
+            responseCode = CardApiCodes.FORBIDDEN,
+            description = CardApiMessages.FORBIDDEN,
         ),
         ApiResponse(
             responseCode = CardApiCodes.NOT_FOUND,
