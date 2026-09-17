@@ -12,12 +12,17 @@ export const API_ENDPOINTS = {
         current: "/user",
     },
 
+    cards: {
+        update: (cardId: string) =>
+            `/cards/${cardId}`,
+    },
+
     answer: {
         evaluate: (cardId: string) =>
-        `/answer/${cardId}`,
+            `/answer/${cardId}`,
 
         reveal: (cardId: string) =>
-        `/answer/${cardId}/reveal`,
+            `/answer/${cardId}/reveal`,
 
         all: "/answer",
     },
@@ -29,7 +34,7 @@ export const API_ENDPOINTS = {
     desks: {
         all: "/desks",
         byId: (deskId: string) =>
-        `/desks/${deskId}`,
+            `/desks/${deskId}`,
         statistics: "/desks/statistics",
     },
 
