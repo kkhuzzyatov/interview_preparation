@@ -22,12 +22,13 @@ class JwtProvider(
     fun generate(
         userId: UUID,
         email: String,
+        role: String,
     ): String =
         Jwts
             .builder()
             .subject(userId.toString())
             .claim("email", email)
-            .claim("role", "USER")
+            .claim("role", role)
             .issuedAt(Date())
             .expiration(
                 Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L),

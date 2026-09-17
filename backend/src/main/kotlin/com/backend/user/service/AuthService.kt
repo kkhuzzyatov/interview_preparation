@@ -5,6 +5,7 @@ import com.backend.exceptions.UserIsNotExistException
 import com.backend.jwt.JwtProvider
 import com.backend.user.controller.dto.LoginResult
 import com.backend.user.entity.User
+import com.backend.user.model.UserRole
 import com.backend.user.repository.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -31,6 +32,7 @@ class AuthService(
                 username = username,
                 email = email,
                 passwordHash = requireNotNull(passwordEncoder.encode(password)),
+                UserRole.USER,
             )
 
         return userRepository.save(user)
@@ -48,7 +50,7 @@ class AuthService(
             throw IllegalArgumentException("Wrong email or password")
         }
 
-        val token = jwtProvider.generate(user.id, user.email)
+        val token = jwtProvider.generate(user.id, user.email, "USER")
 
         return LoginResult(token)
     }

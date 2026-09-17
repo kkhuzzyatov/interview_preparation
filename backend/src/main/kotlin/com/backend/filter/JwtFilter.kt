@@ -25,45 +25,44 @@ class JwtFilter(
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
-        val header = request.getHeader("Authorization")
+        val authorizationHeader = request.getHeader("Authorization")
 
-        if (header != null && header.startsWith("Bearer ")) {
-            try {
-                val token = header.substring(7)
-                val claims: Claims = jwtProvider.validate(token)
-
-                val userId = UUID.fromString(claims.subject)
-                val role = claims.get("role", String::class.java)
-
-                val authorities =
-                    if (role != null) {
-                        listOf(
-                            SimpleGrantedAuthority("ROLE_$role"),
-                        )
-                    } else {
-                        emptyList()
-                    }
-
-                val auth =
-                    UsernamePasswordAuthenticationToken(
-                        userId,
-                        null,
-                        authorities,
-                    )
-
-                auth.details = claims
-
-                SecurityContextHolder
-                    .getContext()
-                    .authentication = auth
-            } catch (e: JwtException) {
-                SecurityContextHolder.clearContext()
-            } catch (e: IllegalArgumentException) {
-                // Invalid UUID in JWT subject
-                SecurityContextHolder.clearContext()
-            }
+        if (authorizationHeader?.startsWith(BEARER_PREFIX) == true) {
+            authenticate(authorizationHeader.removePrefix(BEARER_PREFIX))
         }
 
         filterChain.doFilter(request, response)
+    }
+
+    private fun authenticate(token: String) {
+        try {
+            val claims: Claims = jwtProvider.validate(token)
+            val userId = UUID.fromString(claims.subject)
+            val role =
+                claims.get("role", String::class.java)
+                    ?: throw JwtException("Role is missing from JWT")
+
+            val authority = SimpleGrantedAuthority("ROLE_$role")
+
+            val authentication =
+                UsernamePasswordAuthenticationToken(
+                    userId,
+                    null,
+                    listOf(authority),
+                ).apply {
+                    details = claims
+                }
+
+            SecurityContextHolder.getContext().authentication = authentication
+        } catch (e: JwtException) {
+            SecurityContextHolder.clearContext()
+        } catch (e: IllegalArgumentException) {
+            // Invalid UUID in JWT subject.
+            SecurityContextHolder.clearContext()
+        }
+    }
+
+    private companion object {
+        const val BEARER_PREFIX = "Bearer "
     }
 }

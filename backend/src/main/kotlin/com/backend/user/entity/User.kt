@@ -1,7 +1,10 @@
 package com.backend.user.entity
 
+import com.backend.user.model.UserRole
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.util.UUID
@@ -12,10 +15,13 @@ class User(
     @Id
     @Column(name = "user_id", nullable = false)
     val id: UUID,
-    @Column(name = "username", nullable = false, length = 64)
+    @Column(name = "username", nullable = false, unique = true, length = 64)
     var username: String,
     @Column(name = "email", nullable = false, unique = true, length = 255)
     var email: String,
     @Column(name = "password_hash", nullable = false, length = 255)
     var passwordHash: String,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 16)
+    var role: UserRole,
 )
