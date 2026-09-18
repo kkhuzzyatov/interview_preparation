@@ -1,7 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./Header.module.css";
 
-export default function Header() {
+interface HeaderProps {
+  isAdmin?: boolean;
+}
+
+export default function Header({
+  isAdmin = false,
+}: HeaderProps) {
   const navigate = useNavigate();
 
   return (
@@ -23,13 +29,25 @@ export default function Header() {
           ANSWERS
         </button>
 
-        <button
-          type="button"
-          className={styles.navButton}
-          onClick={() => navigate("/cards")}
-        >
-          CARDS
-        </button>
+        {isAdmin && (
+          <>
+            <button
+              type="button"
+              className={styles.navButton}
+              onClick={() => navigate("/cards")}
+            >
+              CARDS
+            </button>
+
+            <button
+              type="button"
+              className={styles.navButton}
+              onClick={() => navigate("/settings")}
+            >
+              SETTINGS
+            </button>
+          </>
+        )}
 
         <button
           type="button"

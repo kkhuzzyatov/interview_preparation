@@ -16,52 +16,68 @@ import ReviewPage from "./pages/review/ReviewPage";
 import AnswerPage from "./pages/answer/AnswerPage";
 import LeaderboardPage from "./pages/leaderboard/LeaderboardPage";
 import CardPage from "./pages/card/CardPage";
+import SettingPage from "./pages/setting/SettingPage";
 
 import { getCurrentUser } from "./api/userApi";
 
 function ProtectedRoute() {
-  const [authenticated, setAuthenticated] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function checkAuthentication() {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        setAuthenticated(false);
+        setUser(null);
+        setLoading(false);
         return;
       }
 
       try {
-        await getCurrentUser(token);
-        setAuthenticated(true);
+        const currentUser = await getCurrentUser(token);
+        setUser(currentUser);
       } catch {
         localStorage.removeItem("token");
-        setAuthenticated(false);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
     }
 
     checkAuthentication();
   }, []);
 
-  // Authentication check is still in progress
-  if (authenticated === null) {
+  if (loading) {
     return null;
   }
 
-  // User is not authenticated
-  if (!authenticated) {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // User is authenticated
+  return (
+    <>
+      <Header isAdmin={user.role === "ADMIN"} />
+
+      <Outlet context={{ user }} />
+    </>
+  );
+}
+
+function AdminRoute() {
+  const { user } = require("react-router-dom").useOutletContext();
+
+  if (user?.role !== "ADMIN") {
+    return <Navigate to="/" replace />;
+  }
+
   return <Outlet />;
 }
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Header />
-
       <Routes>
         <Route
           path="/login"
@@ -94,10 +110,17 @@ export default function App() {
             element={<LeaderboardPage />}
           />
 
-          <Route
-            path="/cards"
-            element={<CardPage />}
-          />
+          <Route element={<AdminRoute />}>
+            <Route
+              path="/cards"
+              element={<CardPage />}
+            />
+
+            <Route
+              path="/settings"
+              element={<SettingPage />}
+            />
+          </Route>
         </Route>
 
         <Route

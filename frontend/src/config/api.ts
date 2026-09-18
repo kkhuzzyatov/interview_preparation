@@ -1,46 +1,50 @@
 export const API_BASE_URL =
-import.meta.env.VITE_API_BASE_URL ??
-"http://localhost:8080/api";
+  import.meta.env.VITE_API_BASE_URL ??
+  "http://localhost:8080/api";
 
 export const API_ENDPOINTS = {
-    auth: {
-        login: "/auth/login",
-    },
+  auth: {
+    login: "/auth/login",
+  },
 
-    user: {
-        register: "/user",
-        current: "/user",
-    },
+  user: {
+    register: "/user",
+    current: "/user",
+  },
 
-    cards: {
-        update: (cardId: string) =>
-            `/cards/${cardId}`,
-    },
+  cards: {
+    update: (cardId: string) =>
+      `/cards/${cardId}`,
+  },
 
-    answer: {
-        evaluate: (cardId: string) =>
-            `/answer/${cardId}`,
+  settings: {
+    all: "/settings",
+  },
 
-        reveal: (cardId: string) =>
-            `/answer/${cardId}/reveal`,
+  answer: {
+    evaluate: (cardId: string) =>
+      `/answer/${cardId}`,
 
-        all: "/answer",
-    },
+    reveal: (cardId: string) =>
+      `/answer/${cardId}/reveal`,
 
-    review: {
-        next: "/review/next",
-    },
+    all: "/answer",
+  },
 
-    desks: {
-        all: "/desks",
-        byId: (deskId: string) =>
-            `/desks/${deskId}`,
-        statistics: "/desks/statistics",
-    },
+  review: {
+    next: "/review/next",
+  },
 
-    leaderboard: {
-        day: "/leaderboard/day",
-        week: "/leaderboard/week",
-        allTime: "/leaderboard/all-time",
-    },
+  desks: {
+    all: "/desks",
+    byId: (deskId: string) =>
+      `/desks/${deskId}`,
+    statistics: "/desks/statistics",
+  },
+
+  leaderboard: {
+    day: "/leaderboard/day",
+    week: "/leaderboard/week",
+    allTime: "/leaderboard/all-time",
+  },
 };
