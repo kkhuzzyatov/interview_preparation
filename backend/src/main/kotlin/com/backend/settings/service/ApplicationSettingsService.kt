@@ -1,5 +1,7 @@
 package com.backend.settings.service
 
+import com.backend.exceptions.ApplicationSettingsAlreadyExistsException
+import com.backend.exceptions.ApplicationSettingsNotFoundException
 import com.backend.settings.controller.dto.SettingsRequestDto
 import com.backend.settings.repository.ApplicationSettingsRepository
 import com.backend.settings.repository.entity.ApplicationSettings
@@ -14,7 +16,9 @@ class ApplicationSettingsService(
         applicationSettingsRepository
             .findById(SETTINGS_ID)
             .orElseThrow {
-                IllegalStateException("Application settings not found")
+                ApplicationSettingsNotFoundException(
+                    "Application settings not found",
+                )
             }
 
     @Transactional
@@ -45,8 +49,10 @@ class ApplicationSettingsService(
 
     @Transactional
     fun create(request: SettingsRequestDto): ApplicationSettings {
-        require(!applicationSettingsRepository.existsById(SETTINGS_ID)) {
-            "Application settings already exist"
+        if (applicationSettingsRepository.existsById(SETTINGS_ID)) {
+            throw ApplicationSettingsAlreadyExistsException(
+                "Application settings already exist",
+            )
         }
 
         val settings =

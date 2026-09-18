@@ -20,39 +20,56 @@ import java.util.NoSuchElementException
 class GlobalExceptionHandler {
     private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
-    @ExceptionHandler(NoCardsAvailableException::class)
-    fun handleNoCardsAvailable(exception: NoCardsAvailableException): ResponseEntity<ErrorResponse> =
+    @ExceptionHandler(ApplicationSettingsNotFoundException::class)
+    fun handleApplicationSettingsNotFound(exception: ApplicationSettingsNotFoundException): ResponseEntity<ErrorResponse> =
         buildResponse(
             exception = exception,
             status = HttpStatus.NOT_FOUND,
         )
 
-    @ExceptionHandler(UserIsNotExistException::class)
-    fun handleUserIsNotExist(exception: UserIsNotExistException): ResponseEntity<ErrorResponse> =
-        buildResponse(
-            exception = exception,
-            status = HttpStatus.NOT_FOUND,
-        )
-
-    @ExceptionHandler(CardNotFoundException::class)
-    fun handleCardNotFound(exception: CardNotFoundException): ResponseEntity<ErrorResponse> =
-        buildResponse(
-            exception = exception,
-            status = HttpStatus.NOT_FOUND,
-        )
-
-    @ExceptionHandler(UserAlreadyExistsException::class)
-    fun handleUserAlreadyExists(exception: UserAlreadyExistsException): ResponseEntity<ErrorResponse> =
+    @ExceptionHandler(ApplicationSettingsAlreadyExistsException::class)
+    fun handleApplicationSettingsAlreadyExists(exception: ApplicationSettingsAlreadyExistsException): ResponseEntity<ErrorResponse> =
         buildResponse(
             exception = exception,
             status = HttpStatus.CONFLICT,
         )
 
-    @ExceptionHandler(IllegalArgumentException::class)
-    fun handleIllegalArgument(exception: IllegalArgumentException): ResponseEntity<ErrorResponse> =
+    @ExceptionHandler(NoSuchElementException::class)
+    fun handleNoSuchElement(exception: NoSuchElementException): ResponseEntity<ErrorResponse> =
         buildResponse(
             exception = exception,
-            status = HttpStatus.BAD_REQUEST,
+            status = HttpStatus.NOT_FOUND,
+        )
+
+    @ExceptionHandler(EntityNotFoundException::class)
+    fun handleEntityNotFound(exception: EntityNotFoundException): ResponseEntity<ErrorResponse> =
+        buildResponse(
+            exception = exception,
+            status = HttpStatus.NOT_FOUND,
+        )
+
+    @ExceptionHandler(EmptyResultDataAccessException::class)
+    fun handleEmptyResult(exception: EmptyResultDataAccessException): ResponseEntity<ErrorResponse> =
+        buildResponse(
+            exception = exception,
+            status = HttpStatus.NOT_FOUND,
+            message = "Resource not found",
+        )
+
+    @ExceptionHandler(SQLException::class)
+    fun handleSqlException(exception: SQLException): ResponseEntity<ErrorResponse> =
+        buildResponse(
+            exception = exception,
+            status = HttpStatus.INTERNAL_SERVER_ERROR,
+            message = "Database error",
+        )
+
+    @ExceptionHandler(DuplicateKeyException::class)
+    fun handleDuplicateKey(exception: DuplicateKeyException): ResponseEntity<ErrorResponse> =
+        buildResponse(
+            exception = exception,
+            status = HttpStatus.CONFLICT,
+            message = "Resource already exists",
         )
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException::class)
@@ -94,51 +111,6 @@ class GlobalExceptionHandler {
             exception = exception,
             status = HttpStatus.FORBIDDEN,
             message = "Access denied",
-        )
-
-    @ExceptionHandler(NoSuchElementException::class)
-    fun handleNoSuchElement(exception: NoSuchElementException): ResponseEntity<ErrorResponse> =
-        buildResponse(
-            exception = exception,
-            status = HttpStatus.NOT_FOUND,
-        )
-
-    @ExceptionHandler(EntityNotFoundException::class)
-    fun handleEntityNotFound(exception: EntityNotFoundException): ResponseEntity<ErrorResponse> =
-        buildResponse(
-            exception = exception,
-            status = HttpStatus.NOT_FOUND,
-        )
-
-    @ExceptionHandler(EmptyResultDataAccessException::class)
-    fun handleEmptyResult(exception: EmptyResultDataAccessException): ResponseEntity<ErrorResponse> =
-        buildResponse(
-            exception = exception,
-            status = HttpStatus.NOT_FOUND,
-            message = "Resource not found",
-        )
-
-    @ExceptionHandler(SQLException::class)
-    fun handleSqlException(exception: SQLException): ResponseEntity<ErrorResponse> =
-        buildResponse(
-            exception = exception,
-            status = HttpStatus.INTERNAL_SERVER_ERROR,
-            message = "Database error",
-        )
-
-    @ExceptionHandler(DuplicateKeyException::class)
-    fun handleDuplicateKey(exception: DuplicateKeyException): ResponseEntity<ErrorResponse> =
-        buildResponse(
-            exception = exception,
-            status = HttpStatus.CONFLICT,
-            message = "Resource already exists",
-        )
-
-    @ExceptionHandler(IllegalStateException::class)
-    fun handleIllegalState(exception: IllegalStateException): ResponseEntity<ErrorResponse> =
-        buildResponse(
-            exception = exception,
-            status = HttpStatus.CONFLICT,
         )
 
     @ExceptionHandler(HttpMessageNotReadableException::class)

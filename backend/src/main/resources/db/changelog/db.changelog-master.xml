@@ -38,4 +38,12 @@
                 stripComments="true"/>
     </changeSet>
 
+    <changeSet id="5" author="kamil">
+        <sqlFile
+                path="sql/application_settings_insert.sql"
+                relativeToChangelogFile="true"
+                splitStatements="true"
+                stripComments="true"/>
+    </changeSet>
+
 </databaseChangeLog>
