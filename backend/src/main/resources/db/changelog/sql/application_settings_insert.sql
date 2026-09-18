@@ -1,21 +1,7 @@
 INSERT INTO application_settings (
-    id,
-    answer_evaluation_prompt,
-
-    evaluation_red_average_score,
-    evaluation_green_min_answers,
-    evaluation_green_average_score,
-
-    review_multiplier_recency_default_multiplier,
-    review_multiplier_meet_chance_min,
-    review_multiplier_meet_chance_max,
-    review_multiplier_min_score,
-    review_multiplier_max_score,
-    review_multiplier_base_difficulty_multiplier,
-    review_multiplier_default_difficulty_multiplier
+    answer_evaluation_prompt
 )
 VALUES (
-    1,
     'Строго, но справедливо оцени ответ кандидата на технический вопрос.
 
 Оценивай только те знания, которые кандидат явно продемонстрировал в своем ответе.
@@ -35,17 +21,53 @@ VALUES (
 Ответ кандидата: %s
 
 Верни ТОЛЬКО валидный JSON без markdown:
-{"score":0,"feedback":"Максимум 2 коротких предложения на русском."}',
-    
-    6.0,
-    5,
-    8.5,
-
-    3.0,
-    0.0,
-    100.0,
-    0,
-    10,
-    1.0,
-    1.5
+{"score":0,"feedback":"Максимум 2 коротких предложения на русском."}'
 );
+
+INSERT INTO recency_multipliers (
+    seconds_border,
+    multiplier
+)
+VALUES
+    (0, 0),
+    (10, 0.25),
+    (150, 0.5),
+    (300, 1),
+    (3600, 1.25),
+    (86400, 1.5);
+
+
+INSERT INTO meet_chance_multipliers (
+    meet_chance_border,
+    multiplier
+)
+VALUES
+    (0.32, 0.5),
+    (0.96, 1),
+    (2.56, 1.5),
+    (5.45, 2),
+    (10.8, 2.5),
+    (14.05, 3),
+    (25.96, 5);
+
+
+INSERT INTO difficulty_multipliers (
+    last_answer_score_border,
+    multiplier
+)
+VALUES
+    (3, 5),
+    (5, 3),
+    (7, 1),
+    (8, 0.5),
+    (9, 0.25),
+    (10, 0.1);
+
+INSERT INTO score_color (
+    score,
+    color_hex
+)
+VALUES
+    (7, '#00FF00'),
+    (5, '#FFFF00'),
+    (0, '#FF0000');

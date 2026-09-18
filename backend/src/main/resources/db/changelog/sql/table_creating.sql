@@ -44,20 +44,31 @@ CREATE TABLE answers (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE application_settings (
-    id BIGINT PRIMARY KEY,
+CREATE TABLE general_application_settings (
+    general_application_setting_id INT PRIMARY KEY AUTO_INCREMENT,
+    answer_evaluation_prompt TEXT NOT NULL
+);
 
-    answer_evaluation_prompt TEXT NOT NULL,
+CREATE TABLE recency_multipliers (
+    recency_multiplier_id INT PRIMARY KEY AUTO_INCREMENT,
+    seconds_border INT NOT NULL,
+    multiplier DOUBLE NOT NULL
+);
 
-    evaluation_red_average_score DOUBLE PRECISION NOT NULL,
-    evaluation_green_min_answers INTEGER NOT NULL,
-    evaluation_green_average_score DOUBLE PRECISION NOT NULL,
+CREATE TABLE meet_chance_multipliers (
+    meet_chance_multiplier_id INT PRIMARY KEY AUTO_INCREMENT,
+    meet_chance_border DOUBLE NOT NULL,
+    multiplier DOUBLE NOT NULL
+);
 
-    review_multiplier_recency_default_multiplier DOUBLE PRECISION NOT NULL,
-    review_multiplier_meet_chance_min DOUBLE PRECISION NOT NULL,
-    review_multiplier_meet_chance_max DOUBLE PRECISION NOT NULL,
-    review_multiplier_min_score INTEGER NOT NULL,
-    review_multiplier_max_score INTEGER NOT NULL,
-    review_multiplier_base_difficulty_multiplier DOUBLE PRECISION NOT NULL,
-    review_multiplier_default_difficulty_multiplier DOUBLE PRECISION NOT NULL
+CREATE TABLE difficulty_multipliers (
+    difficulty_multiplier_id INT PRIMARY KEY AUTO_INCREMENT,
+    last_answer_score_border INT NOT NULL,
+    multiplier DOUBLE NOT NULL
+);
+
+CREATE TABLE score_color (
+    score_colors_id INT PRIMARY KEY AUTO_INCREMENT,
+    score INT NOT NULL,
+    color_hex VARCHAR(255) NOT NULL
 );
