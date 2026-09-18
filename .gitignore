@@ -16,6 +16,7 @@ out/
 ### bash utils
 *.sh
 !build.sh
+!admin_setting.sh
 
 # =========================
 # Android
