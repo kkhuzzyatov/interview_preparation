@@ -1,6 +1,7 @@
 package com.backend.filter
 
 import com.backend.jwt.JwtProvider
+import com.backend.user.repository.UserRepository
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
 import jakarta.servlet.FilterChain
@@ -18,6 +19,7 @@ import java.util.UUID
 @Component
 class JwtFilter(
     private val jwtProvider: JwtProvider,
+    private val userRepository: UserRepository,
 ) : OncePerRequestFilter() {
     @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(
@@ -38,11 +40,16 @@ class JwtFilter(
         try {
             val claims: Claims = jwtProvider.validate(token)
             val userId = UUID.fromString(claims.subject)
-            val role =
-                claims.get("role", String::class.java)
-                    ?: throw JwtException("Role is missing from JWT")
 
-            val authority = SimpleGrantedAuthority("ROLE_$role")
+            val user =
+                userRepository
+                    .findById(userId)
+                    .orElseThrow {
+                        JwtException("User not found")
+                    }
+
+            val authority =
+                SimpleGrantedAuthority("ROLE_${user.role.name}")
 
             val authentication =
                 UsernamePasswordAuthenticationToken(

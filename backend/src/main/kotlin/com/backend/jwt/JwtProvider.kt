@@ -19,16 +19,10 @@ class JwtProvider(
             Base64.getDecoder().decode(jwtProperties.secret),
         )
 
-    fun generate(
-        userId: UUID,
-        email: String,
-        role: String,
-    ): String =
+    fun generate(userId: UUID): String =
         Jwts
             .builder()
             .subject(userId.toString())
-            .claim("email", email)
-            .claim("role", role)
             .issuedAt(Date())
             .expiration(
                 Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L),

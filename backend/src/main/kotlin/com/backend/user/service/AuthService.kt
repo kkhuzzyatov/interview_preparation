@@ -32,7 +32,7 @@ class AuthService(
                 username = username,
                 email = email,
                 passwordHash = requireNotNull(passwordEncoder.encode(password)),
-                UserRole.USER,
+                role = UserRole.USER,
             )
 
         return userRepository.save(user)
@@ -50,7 +50,7 @@ class AuthService(
             throw IllegalArgumentException("Wrong email or password")
         }
 
-        val token = jwtProvider.generate(user.id, user.email, "USER")
+        val token = jwtProvider.generate(user.id)
 
         return LoginResult(token)
     }
