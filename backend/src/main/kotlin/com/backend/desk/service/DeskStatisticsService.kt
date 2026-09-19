@@ -61,6 +61,13 @@ class DeskStatisticsService(
                 )
             }
 
+            statistics.add(
+                ScoreColorStatistics(
+                    colorHex = "#2563eb",
+                    count = desk.cards.size - statistics.sumOf { it.count },
+                ),
+            )
+
             result.add(
                 DeskCardLevelStatisticsResponse(
                     deskId = desk.id,
