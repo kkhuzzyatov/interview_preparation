@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import styles from "./SettingPage.module.css";
 
 import {
-  createSettings,
-  deleteSettings,
   getSettings,
   updateSettings,
 } from "../../api/settingApi";
@@ -11,118 +9,92 @@ import {
 const DEFAULT_SETTINGS = {
   answerEvaluationPrompt: "",
 
-  evaluationRedAverageScore: 0,
-  evaluationGreenMinAnswers: 0,
-  evaluationGreenAverageScore: 0,
-
-  reviewMultiplierRecencyDefaultMultiplier: 1,
-  reviewMultiplierMeetChanceMin: 0,
-  reviewMultiplierMeetChanceMax: 1,
-  reviewMultiplierMinScore: 0,
-  reviewMultiplierMaxScore: 100,
-  reviewMultiplierBaseDifficultyMultiplier: 1,
-  reviewMultiplierDefaultDifficultyMultiplier: 1,
+  difficultyMultipliers: [],
+  meetChanceMultipliers: [],
+  recencyMultipliers: [],
+  scoreColor: [],
 };
 
-const NUMBER_FIELDS = [
-  "evaluationRedAverageScore",
-  "evaluationGreenMinAnswers",
-  "evaluationGreenAverageScore",
-  "reviewMultiplierRecencyDefaultMultiplier",
-  "reviewMultiplierMeetChanceMin",
-  "reviewMultiplierMeetChanceMax",
-  "reviewMultiplierMinScore",
-  "reviewMultiplierMaxScore",
-  "reviewMultiplierBaseDifficultyMultiplier",
-  "reviewMultiplierDefaultDifficultyMultiplier",
-];
+function createDifficultyMultiplier() {
+  return {
+    lastAnswerScoreBorder: 0,
+    multiplier: 1,
+  };
+}
+
+function createMeetChanceMultiplier() {
+  return {
+    meetChanceBorder: 0,
+    multiplier: 1,
+  };
+}
+
+function createRecencyMultiplier() {
+  return {
+    secondsBorder: 0,
+    multiplier: 1,
+  };
+}
+
+function createScoreColor() {
+  return {
+    score: 0,
+    colorHex: "#000000",
+  };
+}
 
 function normalizeSettings(settings) {
   return {
     answerEvaluationPrompt:
       settings.answerEvaluationPrompt ?? "",
 
-    evaluationRedAverageScore:
-      settings.evaluationRedAverageScore ?? 0,
+    difficultyMultipliers:
+      settings.difficultyMultipliers ?? [],
 
-    evaluationGreenMinAnswers:
-      settings.evaluationGreenMinAnswers ?? 0,
+    meetChanceMultipliers:
+      settings.meetChanceMultipliers ?? [],
 
-    evaluationGreenAverageScore:
-      settings.evaluationGreenAverageScore ?? 0,
+    recencyMultipliers:
+      settings.recencyMultipliers ?? [],
 
-    reviewMultiplierRecencyDefaultMultiplier:
-      settings.reviewMultiplierRecencyDefaultMultiplier ?? 1,
-
-    reviewMultiplierMeetChanceMin:
-      settings.reviewMultiplierMeetChanceMin ?? 0,
-
-    reviewMultiplierMeetChanceMax:
-      settings.reviewMultiplierMeetChanceMax ?? 1,
-
-    reviewMultiplierMinScore:
-      settings.reviewMultiplierMinScore ?? 0,
-
-    reviewMultiplierMaxScore:
-      settings.reviewMultiplierMaxScore ?? 100,
-
-    reviewMultiplierBaseDifficultyMultiplier:
-      settings.reviewMultiplierBaseDifficultyMultiplier ?? 1,
-
-    reviewMultiplierDefaultDifficultyMultiplier:
-      settings.reviewMultiplierDefaultDifficultyMultiplier ?? 1,
+    scoreColor:
+      settings.scoreColor ?? [],
   };
 }
 
 function toRequest(settings) {
   return {
-    answerEvaluationPrompt:
-      settings.answerEvaluationPrompt,
+    answerEvaluationPrompt: settings.answerEvaluationPrompt,
 
-    evaluationRedAverageScore:
-      Number(settings.evaluationRedAverageScore),
+    difficultyMultipliers:
+      settings.difficultyMultipliers.map((item) => ({
+        lastAnswerScoreBorder: Number(item.lastAnswerScoreBorder),
+        multiplier: Number(item.multiplier),
+      })),
 
-    evaluationGreenMinAnswers:
-      Number(settings.evaluationGreenMinAnswers),
+    meetChanceMultipliers:
+      settings.meetChanceMultipliers.map((item) => ({
+        meetChanceBorder: Number(item.meetChanceBorder),
+        multiplier: Number(item.multiplier),
+      })),
 
-    evaluationGreenAverageScore:
-      Number(settings.evaluationGreenAverageScore),
+    recencyMultipliers:
+      settings.recencyMultipliers.map((item) => ({
+        secondsBorder: Number(item.secondsBorder),
+        multiplier: Number(item.multiplier),
+      })),
 
-    reviewMultiplierRecencyDefaultMultiplier:
-      Number(
-        settings.reviewMultiplierRecencyDefaultMultiplier
-      ),
-
-    reviewMultiplierMeetChanceMin:
-      Number(settings.reviewMultiplierMeetChanceMin),
-
-    reviewMultiplierMeetChanceMax:
-      Number(settings.reviewMultiplierMeetChanceMax),
-
-    reviewMultiplierMinScore:
-      Number(settings.reviewMultiplierMinScore),
-
-    reviewMultiplierMaxScore:
-      Number(settings.reviewMultiplierMaxScore),
-
-    reviewMultiplierBaseDifficultyMultiplier:
-      Number(
-        settings.reviewMultiplierBaseDifficultyMultiplier
-      ),
-
-    reviewMultiplierDefaultDifficultyMultiplier:
-      Number(
-        settings.reviewMultiplierDefaultDifficultyMultiplier
-      ),
+    scoreColor:
+      settings.scoreColor.map((item) => ({
+        score: Number(item.score),
+        colorHex: item.colorHex,
+      })),
   };
 }
 
 export default function SettingPage() {
-  const [settings, setSettings] = useState(
-    DEFAULT_SETTINGS
-  );
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
 
-  const [exists, setExists] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -138,13 +110,11 @@ export default function SettingPage() {
         const data = await getSettings();
 
         setSettings(normalizeSettings(data));
-        setExists(true);
       } catch (err) {
         if (
           err instanceof Error &&
           err.message === "Настройки не найдены"
         ) {
-          setExists(false);
           setSettings(DEFAULT_SETTINGS);
         } else {
           setError(
@@ -161,14 +131,54 @@ export default function SettingPage() {
     loadSettings();
   }, []);
 
-  function handleChange(event) {
-    const { name, value } = event.target;
-
+  function handlePromptChange(event) {
     setSettings((previous) => ({
       ...previous,
-      [name]: NUMBER_FIELDS.includes(name)
-        ? value
-        : value,
+      answerEvaluationPrompt: event.target.value,
+    }));
+
+    setSuccess("");
+    setError("");
+  }
+
+  function updateListItem(listName, index, field, value) {
+    setSettings((previous) => {
+      const list = [...previous[listName]];
+
+      list[index] = {
+        ...list[index],
+        [field]: value,
+      };
+
+      return {
+        ...previous,
+        [listName]: list,
+      };
+    });
+
+    setSuccess("");
+    setError("");
+  }
+
+  function addListItem(listName, factory) {
+    setSettings((previous) => ({
+      ...previous,
+      [listName]: [
+        ...previous[listName],
+        factory(),
+      ],
+    }));
+
+    setSuccess("");
+    setError("");
+  }
+
+  function removeListItem(listName, index) {
+    setSettings((previous) => ({
+      ...previous,
+      [listName]: previous[listName].filter(
+        (_, itemIndex) => itemIndex !== index
+      ),
     }));
 
     setSuccess("");
@@ -184,49 +194,15 @@ export default function SettingPage() {
       setSuccess("");
 
       const request = toRequest(settings);
-
-      const data = exists
-        ? await updateSettings(request)
-        : await createSettings(request);
+      const data = await updateSettings(request);
 
       setSettings(normalizeSettings(data));
-      setExists(true);
       setSuccess("Settings saved successfully.");
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
           : "Failed to save settings"
-      );
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleDelete() {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete application settings?"
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      setSaving(true);
-      setError("");
-      setSuccess("");
-
-      await deleteSettings();
-
-      setSettings(DEFAULT_SETTINGS);
-      setExists(false);
-      setSuccess("Settings deleted successfully.");
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to delete settings"
       );
     } finally {
       setSaving(false);
@@ -281,212 +257,415 @@ export default function SettingPage() {
 
             <textarea
               id="answerEvaluationPrompt"
-              name="answerEvaluationPrompt"
               value={settings.answerEvaluationPrompt}
-              onChange={handleChange}
+              onChange={handlePromptChange}
               rows={8}
               disabled={saving}
             />
           </div>
+        </section>
 
-          <div className={styles.grid}>
-            <div className={styles.field}>
-              <label htmlFor="evaluationRedAverageScore">
-                RED AVERAGE SCORE
-              </label>
-
-              <input
-                id="evaluationRedAverageScore"
-                name="evaluationRedAverageScore"
-                type="number"
-                step="any"
-                value={
-                  settings.evaluationRedAverageScore
-                }
-                onChange={handleChange}
-                disabled={saving}
-              />
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <h2>Difficulty multipliers</h2>
+              <p>
+                Multiplier based on the last answer score.
+              </p>
             </div>
 
-            <div className={styles.field}>
-              <label htmlFor="evaluationGreenMinAnswers">
-                GREEN MIN ANSWERS
-              </label>
+            <button
+              type="button"
+              className={styles.addButton}
+              onClick={() =>
+                addListItem(
+                  "difficultyMultipliers",
+                  createDifficultyMultiplier
+                )
+              }
+              disabled={saving}
+            >
+              ADD
+            </button>
+          </div>
 
-              <input
-                id="evaluationGreenMinAnswers"
-                name="evaluationGreenMinAnswers"
-                type="number"
-                value={
-                  settings.evaluationGreenMinAnswers
-                }
-                onChange={handleChange}
-                disabled={saving}
-              />
-            </div>
+          <div className={styles.list}>
+            {settings.difficultyMultipliers.map(
+              (item, index) => (
+                <div
+                  className={styles.row}
+                  key={
+                    item.difficultyMultiplierId ??
+                    `difficulty-${index}`
+                  }
+                >
+                  <div className={styles.field}>
+                    <label>LAST ANSWER SCORE</label>
 
-            <div className={styles.field}>
-              <label htmlFor="evaluationGreenAverageScore">
-                GREEN AVERAGE SCORE
-              </label>
+                    <input
+                      type="number"
+                      value={item.lastAnswerScoreBorder}
+                      onChange={(event) =>
+                        updateListItem(
+                          "difficultyMultipliers",
+                          index,
+                          "lastAnswerScoreBorder",
+                          event.target.value
+                        )
+                      }
+                      disabled={saving}
+                    />
+                  </div>
 
-              <input
-                id="evaluationGreenAverageScore"
-                name="evaluationGreenAverageScore"
-                type="number"
-                step="any"
-                value={
-                  settings.evaluationGreenAverageScore
-                }
-                onChange={handleChange}
-                disabled={saving}
-              />
-            </div>
+                  <div className={styles.field}>
+                    <label>MULTIPLIER</label>
+
+                    <input
+                      type="number"
+                      step="any"
+                      value={item.multiplier}
+                      onChange={(event) =>
+                        updateListItem(
+                          "difficultyMultipliers",
+                          index,
+                          "multiplier",
+                          event.target.value
+                        )
+                      }
+                      disabled={saving}
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    className={styles.removeButton}
+                    onClick={() =>
+                      removeListItem(
+                        "difficultyMultipliers",
+                        index
+                      )
+                    }
+                    disabled={saving}
+                  >
+                    REMOVE
+                  </button>
+                </div>
+              )
+            )}
+
+            {settings.difficultyMultipliers.length === 0 && (
+              <div className={styles.emptyList}>
+                No difficulty multipliers configured.
+              </div>
+            )}
           </div>
         </section>
 
         <section className={styles.section}>
-          <h2>Review multiplier</h2>
-
-          <div className={styles.grid}>
-            <div className={styles.field}>
-              <label htmlFor="reviewMultiplierRecencyDefaultMultiplier">
-                RECENCY DEFAULT MULTIPLIER
-              </label>
-
-              <input
-                id="reviewMultiplierRecencyDefaultMultiplier"
-                name="reviewMultiplierRecencyDefaultMultiplier"
-                type="number"
-                step="any"
-                value={
-                  settings.reviewMultiplierRecencyDefaultMultiplier
-                }
-                onChange={handleChange}
-                disabled={saving}
-              />
+          <div className={styles.sectionHeader}>
+            <div>
+              <h2>Meet chance multipliers</h2>
+              <p>
+                Multiplier based on meet chance.
+              </p>
             </div>
 
-            <div className={styles.field}>
-              <label htmlFor="reviewMultiplierMeetChanceMin">
-                MEET CHANCE MIN
-              </label>
+            <button
+              type="button"
+              className={styles.addButton}
+              onClick={() =>
+                addListItem(
+                  "meetChanceMultipliers",
+                  createMeetChanceMultiplier
+                )
+              }
+              disabled={saving}
+            >
+              ADD
+            </button>
+          </div>
 
-              <input
-                id="reviewMultiplierMeetChanceMin"
-                name="reviewMultiplierMeetChanceMin"
-                type="number"
-                step="any"
-                value={
-                  settings.reviewMultiplierMeetChanceMin
-                }
-                onChange={handleChange}
-                disabled={saving}
-              />
+          <div className={styles.list}>
+            {settings.meetChanceMultipliers.map(
+              (item, index) => (
+                <div
+                  className={styles.row}
+                  key={
+                    item.meetChanceMultiplierId ??
+                    `meet-chance-${index}`
+                  }
+                >
+                  <div className={styles.field}>
+                    <label>MEET CHANCE BORDER</label>
+
+                    <input
+                      type="number"
+                      step="any"
+                      value={item.meetChanceBorder}
+                      onChange={(event) =>
+                        updateListItem(
+                          "meetChanceMultipliers",
+                          index,
+                          "meetChanceBorder",
+                          event.target.value
+                        )
+                      }
+                      disabled={saving}
+                    />
+                  </div>
+
+                  <div className={styles.field}>
+                    <label>MULTIPLIER</label>
+
+                    <input
+                      type="number"
+                      step="any"
+                      value={item.multiplier}
+                      onChange={(event) =>
+                        updateListItem(
+                          "meetChanceMultipliers",
+                          index,
+                          "multiplier",
+                          event.target.value
+                        )
+                      }
+                      disabled={saving}
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    className={styles.removeButton}
+                    onClick={() =>
+                      removeListItem(
+                        "meetChanceMultipliers",
+                        index
+                      )
+                    }
+                    disabled={saving}
+                  >
+                    REMOVE
+                  </button>
+                </div>
+              )
+            )}
+
+            {settings.meetChanceMultipliers.length === 0 && (
+              <div className={styles.emptyList}>
+                No meet chance multipliers configured.
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <h2>Recency multipliers</h2>
+              <p>
+                Multiplier based on time since the last answer.
+              </p>
             </div>
 
-            <div className={styles.field}>
-              <label htmlFor="reviewMultiplierMeetChanceMax">
-                MEET CHANCE MAX
-              </label>
+            <button
+              type="button"
+              className={styles.addButton}
+              onClick={() =>
+                addListItem(
+                  "recencyMultipliers",
+                  createRecencyMultiplier
+                )
+              }
+              disabled={saving}
+            >
+              ADD
+            </button>
+          </div>
 
-              <input
-                id="reviewMultiplierMeetChanceMax"
-                name="reviewMultiplierMeetChanceMax"
-                type="number"
-                step="any"
-                value={
-                  settings.reviewMultiplierMeetChanceMax
-                }
-                onChange={handleChange}
-                disabled={saving}
-              />
+          <div className={styles.list}>
+            {settings.recencyMultipliers.map(
+              (item, index) => (
+                <div
+                  className={styles.row}
+                  key={
+                    item.recencyMultiplierId ??
+                    `recency-${index}`
+                  }
+                >
+                  <div className={styles.field}>
+                    <label>SECONDS BORDER</label>
+
+                    <input
+                      type="number"
+                      value={item.secondsBorder}
+                      onChange={(event) =>
+                        updateListItem(
+                          "recencyMultipliers",
+                          index,
+                          "secondsBorder",
+                          event.target.value
+                        )
+                      }
+                      disabled={saving}
+                    />
+                  </div>
+
+                  <div className={styles.field}>
+                    <label>MULTIPLIER</label>
+
+                    <input
+                      type="number"
+                      step="any"
+                      value={item.multiplier}
+                      onChange={(event) =>
+                        updateListItem(
+                          "recencyMultipliers",
+                          index,
+                          "multiplier",
+                          event.target.value
+                        )
+                      }
+                      disabled={saving}
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    className={styles.removeButton}
+                    onClick={() =>
+                      removeListItem(
+                        "recencyMultipliers",
+                        index
+                      )
+                    }
+                    disabled={saving}
+                  >
+                    REMOVE
+                  </button>
+                </div>
+              )
+            )}
+
+            {settings.recencyMultipliers.length === 0 && (
+              <div className={styles.emptyList}>
+                No recency multipliers configured.
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <h2>Score colors</h2>
+              <p>
+                Color assigned to each score threshold.
+              </p>
             </div>
 
-            <div className={styles.field}>
-              <label htmlFor="reviewMultiplierMinScore">
-                MIN SCORE
-              </label>
+            <button
+              type="button"
+              className={styles.addButton}
+              onClick={() =>
+                addListItem(
+                  "scoreColor",
+                  createScoreColor
+                )
+              }
+              disabled={saving}
+            >
+              ADD
+            </button>
+          </div>
 
-              <input
-                id="reviewMultiplierMinScore"
-                name="reviewMultiplierMinScore"
-                type="number"
-                value={
-                  settings.reviewMultiplierMinScore
-                }
-                onChange={handleChange}
-                disabled={saving}
-              />
-            </div>
+          <div className={styles.list}>
+            {settings.scoreColor.map(
+              (item, index) => (
+                <div
+                  className={styles.row}
+                  key={
+                    item.scoreColorsId ??
+                    `score-color-${index}`
+                  }
+                >
+                  <div className={styles.field}>
+                    <label>SCORE</label>
 
-            <div className={styles.field}>
-              <label htmlFor="reviewMultiplierMaxScore">
-                MAX SCORE
-              </label>
+                    <input
+                      type="number"
+                      value={item.score}
+                      onChange={(event) =>
+                        updateListItem(
+                          "scoreColor",
+                          index,
+                          "score",
+                          event.target.value
+                        )
+                      }
+                      disabled={saving}
+                    />
+                  </div>
 
-              <input
-                id="reviewMultiplierMaxScore"
-                name="reviewMultiplierMaxScore"
-                type="number"
-                value={
-                  settings.reviewMultiplierMaxScore
-                }
-                onChange={handleChange}
-                disabled={saving}
-              />
-            </div>
+                  <div className={styles.field}>
+                    <label>COLOR</label>
 
-            <div className={styles.field}>
-              <label htmlFor="reviewMultiplierBaseDifficultyMultiplier">
-                BASE DIFFICULTY MULTIPLIER
-              </label>
+                    <div className={styles.colorInput}>
+                      <input
+                        type="color"
+                        value={item.colorHex}
+                        onChange={(event) =>
+                          updateListItem(
+                            "scoreColor",
+                            index,
+                            "colorHex",
+                            event.target.value
+                          )
+                        }
+                        disabled={saving}
+                      />
 
-              <input
-                id="reviewMultiplierBaseDifficultyMultiplier"
-                name="reviewMultiplierBaseDifficultyMultiplier"
-                type="number"
-                step="any"
-                value={
-                  settings.reviewMultiplierBaseDifficultyMultiplier
-                }
-                onChange={handleChange}
-                disabled={saving}
-              />
-            </div>
+                      <input
+                        type="text"
+                        value={item.colorHex}
+                        onChange={(event) =>
+                          updateListItem(
+                            "scoreColor",
+                            index,
+                            "colorHex",
+                            event.target.value
+                          )
+                        }
+                        disabled={saving}
+                      />
+                    </div>
+                  </div>
 
-            <div className={styles.field}>
-              <label htmlFor="reviewMultiplierDefaultDifficultyMultiplier">
-                DEFAULT DIFFICULTY MULTIPLIER
-              </label>
+                  <button
+                    type="button"
+                    className={styles.removeButton}
+                    onClick={() =>
+                      removeListItem(
+                        "scoreColor",
+                        index
+                      )
+                    }
+                    disabled={saving}
+                  >
+                    REMOVE
+                  </button>
+                </div>
+              )
+            )}
 
-              <input
-                id="reviewMultiplierDefaultDifficultyMultiplier"
-                name="reviewMultiplierDefaultDifficultyMultiplier"
-                type="number"
-                step="any"
-                value={
-                  settings.reviewMultiplierDefaultDifficultyMultiplier
-                }
-                onChange={handleChange}
-                disabled={saving}
-              />
-            </div>
+            {settings.scoreColor.length === 0 && (
+              <div className={styles.emptyList}>
+                No score colors configured.
+              </div>
+            )}
           </div>
         </section>
 
         <div className={styles.actions}>
-          {exists && (
-            <button
-              type="button"
-              className={styles.deleteButton}
-              onClick={handleDelete}
-              disabled={saving}
-            >
-              DELETE
-            </button>
-          )}
-
           <button
             type="submit"
             className={styles.saveButton}

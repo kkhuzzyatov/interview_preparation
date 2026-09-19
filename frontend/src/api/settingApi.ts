@@ -3,37 +3,44 @@ import {
   API_ENDPOINTS,
 } from "../config/api";
 
+export interface DifficultyMultiplier {
+  difficultyMultiplierId?: number;
+  lastAnswerScoreBorder: number;
+  multiplier: number;
+}
+
+export interface MeetChanceMultiplier {
+  meetChanceMultiplierId?: number;
+  meetChanceBorder: number;
+  multiplier: number;
+}
+
+export interface RecencyMultiplier {
+  recencyMultiplierId?: number;
+  secondsBorder: number;
+  multiplier: number;
+}
+
+export interface ScoreColor {
+  scoreColorsId?: number;
+  score: number;
+  colorHex: string;
+}
+
 export interface ApplicationSettings {
-  id: number;
   answerEvaluationPrompt: string;
-
-  evaluationRedAverageScore: number;
-  evaluationGreenMinAnswers: number;
-  evaluationGreenAverageScore: number;
-
-  reviewMultiplierRecencyDefaultMultiplier: number;
-  reviewMultiplierMeetChanceMin: number;
-  reviewMultiplierMeetChanceMax: number;
-  reviewMultiplierMinScore: number;
-  reviewMultiplierMaxScore: number;
-  reviewMultiplierBaseDifficultyMultiplier: number;
-  reviewMultiplierDefaultDifficultyMultiplier: number;
+  difficultyMultipliers: DifficultyMultiplier[];
+  meetChanceMultipliers: MeetChanceMultiplier[];
+  recencyMultipliers: RecencyMultiplier[];
+  scoreColor: ScoreColor[];
 }
 
 export interface SettingsRequest {
   answerEvaluationPrompt: string;
-
-  evaluationRedAverageScore: number;
-  evaluationGreenMinAnswers: number;
-  evaluationGreenAverageScore: number;
-
-  reviewMultiplierRecencyDefaultMultiplier: number;
-  reviewMultiplierMeetChanceMin: number;
-  reviewMultiplierMeetChanceMax: number;
-  reviewMultiplierMinScore: number;
-  reviewMultiplierMaxScore: number;
-  reviewMultiplierBaseDifficultyMultiplier: number;
-  reviewMultiplierDefaultDifficultyMultiplier: number;
+  difficultyMultipliers: DifficultyMultiplier[];
+  meetChanceMultipliers: MeetChanceMultiplier[];
+  recencyMultipliers: RecencyMultiplier[];
+  scoreColor: ScoreColor[];
 }
 
 async function handleResponse<T>(
@@ -94,9 +101,7 @@ function requireToken(): void {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    throw new Error(
-      "Неавторизован или токен истёк"
-    );
+    throw new Error("Неавторизован или токен истёк");
   }
 }
 
@@ -111,28 +116,7 @@ export async function getSettings(): Promise<ApplicationSettings> {
     }
   );
 
-  return handleResponse<ApplicationSettings>(
-    response
-  );
-}
-
-export async function createSettings(
-  settings: SettingsRequest
-): Promise<ApplicationSettings> {
-  requireToken();
-
-  const response = await fetch(
-    API_BASE_URL + API_ENDPOINTS.settings.all,
-    {
-      method: "POST",
-      headers: getAuthHeaders(),
-      body: JSON.stringify(settings),
-    }
-  );
-
-  return handleResponse<ApplicationSettings>(
-    response
-  );
+  return handleResponse<ApplicationSettings>(response);
 }
 
 export async function updateSettings(
@@ -149,21 +133,5 @@ export async function updateSettings(
     }
   );
 
-  return handleResponse<ApplicationSettings>(
-    response
-  );
-}
-
-export async function deleteSettings(): Promise<void> {
-  requireToken();
-
-  const response = await fetch(
-    API_BASE_URL + API_ENDPOINTS.settings.all,
-    {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    }
-  );
-
-  await handleResponse<void>(response);
+  return handleResponse<ApplicationSettings>(response);
 }
