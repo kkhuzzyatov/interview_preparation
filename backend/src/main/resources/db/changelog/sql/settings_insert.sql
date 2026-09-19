@@ -61,6 +61,6 @@ INSERT INTO score_color (
     color_hex
 )
 VALUES
-    (7, '#00FF00'),
-    (5, '#FFFF00'),
-    (0, '#FF0000');
+    (7, '#16a34a'),
+    (5, '#ca8a04'),
+    (0, '#dc2626');

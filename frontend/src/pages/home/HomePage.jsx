@@ -1,10 +1,19 @@
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import styles from "./HomePage.module.css";
+
 import {
   getAllDesks,
   getDeskStatistics,
 } from "../../api/deskApi";
+
+import styles from "./HomePage.module.css";
+
+function getTotalStatistics(statistics) {
+  return statistics.reduce(
+    (total, statistic) => total + statistic.count,
+    0,
+  );
+}
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -15,6 +24,8 @@ export default function HomePage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadData() {
       try {
         setLoading(true);
@@ -26,52 +37,46 @@ export default function HomePage() {
             getDeskStatistics(),
           ]);
 
+        if (cancelled) {
+          return;
+        }
+
         setDesks(desksData);
         setStatistics(statisticsData);
       } catch (err) {
+        if (cancelled) {
+          return;
+        }
+
         setError(
           err instanceof Error
             ? err.message
-            : "Failed to load desks"
+            : "Failed to load desks",
         );
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     loadData();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  function getDeskStatisticsForDesk(deskId) {
-    if (Array.isArray(statistics)) {
-      const result = statistics.find(
-        (item) => item.deskId === deskId
-      );
-
-      if (result) {
-        return result;
-      }
-    }
-
-    if (
-      statistics &&
-      typeof statistics === "object" &&
-      !Array.isArray(statistics)
-    ) {
-      const result = statistics[deskId];
-
-      if (result) {
-        return result;
-      }
-    }
-
-    return {
-      blue: 0,
-      red: 0,
-      yellow: 0,
-      green: 0,
-    };
-  }
+  const statisticsByDeskId = useMemo(
+    () =>
+      new Map(
+        statistics.map((deskStatistics) => [
+          deskStatistics.deskId,
+          deskStatistics,
+        ]),
+      ),
+    [statistics],
+  );
 
   return (
     <main className={styles.page}>
@@ -102,69 +107,62 @@ export default function HomePage() {
           </div>
         )}
 
-        {error && (
+        {!loading && error && (
           <div className={styles.error}>
             {error}
           </div>
         )}
 
-        {!loading &&
-          !error &&
-          desks.length === 0 && (
-            <div className={styles.message}>
-              No desks yet.
-            </div>
-          )}
+        {!loading && !error && desks.length === 0 && (
+          <div className={styles.message}>
+            No desks yet.
+          </div>
+        )}
 
-        {!loading &&
-          !error &&
-          desks.length > 0 && (
-            <div className={styles.deskList}>
-              {desks.map((desk) => {
-                const stats =
-                  getDeskStatisticsForDesk(desk.id);
+        {!loading && !error && desks.length > 0 && (
+          <div className={styles.deskList}>
+            {desks.map((desk) => {
+              const deskStatistics =
+                statisticsByDeskId.get(desk.id);
 
-                const total =
-                  stats.blue +
-                  stats.red +
-                  stats.yellow +
-                  stats.green;
+              const colorStatistics =
+                deskStatistics?.statistics ?? [];
 
-                return (
-                  <div
-                    className={styles.desk}
-                    key={desk.id}
-                  >
-                    <div className={styles.deskName}>
-                      {desk.name}
-                    </div>
+              const total =
+                getTotalStatistics(colorStatistics);
 
-                    <div className={styles.stats}>
-                      <span className={styles.blue}>
-                        {stats.blue}
-                      </span>
-
-                      <span className={styles.red}>
-                        {stats.red}
-                      </span>
-
-                      <span className={styles.yellow}>
-                        {stats.yellow}
-                      </span>
-
-                      <span className={styles.green}>
-                        {stats.green}
-                      </span>
-
-                      <span className={styles.total}>
-                        ({total})
-                      </span>
-                    </div>
+              return (
+                <div
+                  className={styles.desk}
+                  key={desk.id}
+                >
+                  <div className={styles.deskName}>
+                    {desk.name}
                   </div>
-                );
-              })}
-            </div>
-          )}
+
+                  <div className={styles.stats}>
+                    {colorStatistics.map(
+                      (statistic) => (
+                        <span
+                          key={statistic.colorHex}
+                          style={{
+                            color: statistic.colorHex,
+                          }}
+                        >
+                          {statistic.count}
+                        </span>
+                      ),
+                    )}
+
+                    <span className={styles.total}>
+                      ({total})
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
     </main>
   );

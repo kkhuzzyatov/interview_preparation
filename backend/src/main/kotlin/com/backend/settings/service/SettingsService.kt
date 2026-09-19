@@ -85,7 +85,7 @@ class SettingsService(
 
         generalApplicationSettingsRepository.save(
             GeneralApplicationSettings(
-                generalApplicationSettingId = 0L,
+                generalApplicationSettingId = null,
                 answerEvaluationPrompt = request.answerEvaluationPrompt,
             ),
         )
@@ -93,7 +93,7 @@ class SettingsService(
         difficultyMultiplierRepository.saveAll(
             request.difficultyMultipliers.map {
                 DifficultyMultiplier(
-                    difficultyMultiplierId = 0L,
+                    difficultyMultiplierId = null,
                     lastAnswerScoreBorder = it.lastAnswerScoreBorder,
                     multiplier = it.multiplier,
                 )
@@ -103,7 +103,7 @@ class SettingsService(
         meetChanceMultiplierRepository.saveAll(
             request.meetChanceMultipliers.map {
                 MeetChanceMultiplier(
-                    meetChanceMultiplierId = 0L,
+                    meetChanceMultiplierId = null,
                     meetChanceBorder = it.meetChanceBorder,
                     multiplier = it.multiplier,
                 )
@@ -113,7 +113,7 @@ class SettingsService(
         recencyMultiplierRepository.saveAll(
             request.recencyMultipliers.map {
                 RecencyMultiplier(
-                    recencyMultiplierId = 0L,
+                    recencyMultiplierId = null,
                     secondsBorder = it.secondsBorder,
                     multiplier = it.multiplier,
                 )
@@ -123,7 +123,7 @@ class SettingsService(
         scoreColorRepository.saveAll(
             request.scoreColor.map {
                 ScoreColor(
-                    scoreColorsId = 0L,
+                    scoreColorsId = null,
                     score = it.score,
                     colorHex = it.colorHex,
                 )

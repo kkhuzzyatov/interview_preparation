@@ -14,32 +14,37 @@ export interface CardResponse {
   answer: string;
 }
 
-export interface DeskWithCardsResponse extends DeskResponse {
+export interface DeskWithCardsResponse
+  extends DeskResponse {
   cards: CardResponse[];
 }
 
-export interface DeskStatisticsResponse {
-  deskId: string;
-  blue: number;
-  red: number;
-  yellow: number;
-  green: number;
+export interface ScoreColorStatistics {
+  colorHex: string;
+  count: number;
 }
 
-export type DeskStatisticsData =
-  | DeskStatisticsResponse[]
-  | Record<string, Omit<DeskStatisticsResponse, "deskId">>;
+export interface DeskCardLevelStatisticsResponse {
+  deskId: string;
+  deskName: string;
+  statistics: ScoreColorStatistics[];
+}
 
 async function handleResponse<T>(
-  response: Response
+  response: Response,
 ): Promise<T> {
   if (!response.ok) {
     let message = "Request failed";
 
     try {
-      const error = await response.json();
+      const error: unknown = await response.json();
 
-      if (error.message) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof error.message === "string"
+      ) {
         message = error.message;
       } else if (typeof error === "string") {
         message = error;
@@ -55,55 +60,49 @@ async function handleResponse<T>(
     throw new Error(message);
   }
 
-  return response.json();
+  return response.json() as Promise<T>;
 }
 
-function getAuthHeaders(): Record<string, string> {
+function getAuthHeaders(): HeadersInit {
   const token = localStorage.getItem("token");
 
-  const headers: Record<string, string> = {};
-
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-
-  return headers;
+  return token
+    ? {
+        Authorization: `Bearer ${token}`,
+      }
+    : {};
 }
 
-export async function getAllDesks(): Promise<DeskResponse[]> {
+async function get<T>(endpoint: string): Promise<T> {
   const response = await fetch(
-    API_BASE_URL + API_ENDPOINTS.desks.all,
+    `${API_BASE_URL}${endpoint}`,
     {
       method: "GET",
       headers: getAuthHeaders(),
-    }
+    },
   );
 
-  return handleResponse<DeskResponse[]>(response);
+  return handleResponse<T>(response);
 }
 
-export async function getDeskById(
-  deskId: string
+export function getAllDesks(): Promise<DeskResponse[]> {
+  return get<DeskResponse[]>(
+    API_ENDPOINTS.desks.all,
+  );
+}
+
+export function getDeskById(
+  deskId: string,
 ): Promise<DeskWithCardsResponse> {
-  const response = await fetch(
-    API_BASE_URL + API_ENDPOINTS.desks.byId(deskId),
-    {
-      method: "GET",
-      headers: getAuthHeaders(),
-    }
+  return get<DeskWithCardsResponse>(
+    API_ENDPOINTS.desks.byId(deskId),
   );
-
-  return handleResponse<DeskWithCardsResponse>(response);
 }
 
-export async function getDeskStatistics(): Promise<DeskStatisticsData> {
-  const response = await fetch(
-    API_BASE_URL + API_ENDPOINTS.desks.statistics,
-    {
-      method: "GET",
-      headers: getAuthHeaders(),
-    }
+export function getDeskStatistics(): Promise<
+  DeskCardLevelStatisticsResponse[]
+> {
+  return get<DeskCardLevelStatisticsResponse[]>(
+    API_ENDPOINTS.desks.statistics,
   );
-
-  return handleResponse<DeskStatisticsData>(response);
 }

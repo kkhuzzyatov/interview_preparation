@@ -13,7 +13,7 @@ class RecencyMultiplier(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recency_multiplier_id")
-    var recencyMultiplierId: Long,
+    var recencyMultiplierId: Long?,
     @Column(name = "seconds_border", nullable = false)
     var secondsBorder: Int,
     @Column(name = "multiplier", nullable = false)

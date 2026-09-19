@@ -13,7 +13,7 @@ class MeetChanceMultiplier(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "meet_chance_multiplier_id")
-    var meetChanceMultiplierId: Long,
+    var meetChanceMultiplierId: Long?,
     @Column(name = "meet_chance_border", nullable = false)
     var meetChanceBorder: Double,
     @Column(name = "multiplier", nullable = false)

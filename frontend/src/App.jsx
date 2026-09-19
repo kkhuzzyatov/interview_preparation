@@ -5,6 +5,7 @@ import {
   Route,
   Navigate,
   Outlet,
+  useOutletContext,
 } from "react-router-dom";
 
 import Header from "./components/header/Header";
@@ -25,6 +26,8 @@ function ProtectedRoute() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function checkAuthentication() {
       const token = localStorage.getItem("token");
 
@@ -36,16 +39,27 @@ function ProtectedRoute() {
 
       try {
         const currentUser = await getCurrentUser(token);
-        setUser(currentUser);
+
+        if (!cancelled) {
+          setUser(currentUser);
+        }
       } catch {
-        localStorage.removeItem("token");
-        setUser(null);
+        if (!cancelled) {
+          localStorage.removeItem("token");
+          setUser(null);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     checkAuthentication();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (loading) {
@@ -66,7 +80,7 @@ function ProtectedRoute() {
 }
 
 function AdminRoute() {
-  const { user } = require("react-router-dom").useOutletContext();
+  const { user } = useOutletContext();
 
   if (user?.role !== "ADMIN") {
     return <Navigate to="/" replace />;

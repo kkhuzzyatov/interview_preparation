@@ -9,23 +9,35 @@ export interface RegisterRequest {
   password: string;
 }
 
+export type UserRole = "USER" | "ADMIN";
+
 export interface User {
   id: string;
   username: string;
   email: string;
+  role: UserRole;
 }
 
 async function handleResponse<T>(
-  response: Response
+  response: Response,
 ): Promise<T> {
   if (!response.ok) {
-    const error = await response.json().catch(() => ({
-      message: "Request failed",
-    }));
+    const error: unknown = await response
+      .json()
+      .catch(() => ({
+        message: "Request failed",
+      }));
 
-    throw new Error(
-      error.message || "Request failed"
-    );
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error &&
+      typeof error.message === "string"
+    ) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Request failed");
   }
 
   const contentType =
@@ -38,11 +50,11 @@ async function handleResponse<T>(
     return undefined as T;
   }
 
-  return response.json();
+  return response.json() as Promise<T>;
 }
 
 export async function register(
-  data: RegisterRequest
+  data: RegisterRequest,
 ): Promise<User> {
   const response = await fetch(
     `${API_BASE_URL}${API_ENDPOINTS.user.register}`,
@@ -52,14 +64,14 @@ export async function register(
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    }
+    },
   );
 
   return handleResponse<User>(response);
 }
 
 export async function getCurrentUser(
-  token: string
+  token: string,
 ): Promise<User> {
   const response = await fetch(
     `${API_BASE_URL}${API_ENDPOINTS.user.current}`,
@@ -68,7 +80,7 @@ export async function getCurrentUser(
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   return handleResponse<User>(response);
