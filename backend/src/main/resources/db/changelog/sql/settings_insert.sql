@@ -1,4 +1,4 @@
-INSERT INTO application_settings (
+INSERT INTO general_application_settings (
     answer_evaluation_prompt
 )
 VALUES (

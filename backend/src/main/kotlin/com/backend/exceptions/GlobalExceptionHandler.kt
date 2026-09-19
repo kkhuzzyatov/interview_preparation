@@ -34,6 +34,13 @@ class GlobalExceptionHandler {
             status = HttpStatus.CONFLICT,
         )
 
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgumentException(exception: IllegalArgumentException): ResponseEntity<ErrorResponse> =
+        buildResponse(
+            exception = exception,
+            status = HttpStatus.UNAUTHORIZED,
+        )
+
     @ExceptionHandler(NoSuchElementException::class)
     fun handleNoSuchElement(exception: NoSuchElementException): ResponseEntity<ErrorResponse> =
         buildResponse(
