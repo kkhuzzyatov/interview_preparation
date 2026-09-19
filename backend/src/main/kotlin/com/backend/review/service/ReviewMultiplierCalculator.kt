@@ -1,6 +1,9 @@
 package com.backend.review.service
 
 import com.backend.answer.dto.AnswerResult
+import com.backend.settings.repository.DifficultyMultiplierRepository
+import com.backend.settings.repository.MeetChanceMultiplierRepository
+import com.backend.settings.repository.RecencyMultiplierRepository
 import org.springframework.stereotype.Service
 import java.time.Clock
 import java.time.Duration
@@ -9,6 +12,9 @@ import java.time.LocalDateTime
 @Service
 class ReviewMultiplierCalculator(
     private val clock: Clock,
+    private val recencyMultiplierRepository: RecencyMultiplierRepository,
+    private val meetChanceMultiplierRepository: MeetChanceMultiplierRepository,
+    private val difficultyMultiplierRepository: DifficultyMultiplierRepository,
 ) {
     fun calculateRecencyMultiplier(answeredAt: LocalDateTime): Double {
         val now = LocalDateTime.now(clock)
@@ -18,55 +24,18 @@ class ReviewMultiplierCalculator(
                 .seconds
                 .coerceAtLeast(0)
 
-        return when {
-            ageSeconds <= 10 -> {
-                0.0
-            }
+        val multipliers =
+            recencyMultiplierRepository
+                .findAll()
+                .sortedBy { it.secondsBorder }
 
-            ageSeconds <= 150 -> {
-                interpolate(
-                    x = ageSeconds.toDouble(),
-                    x1 = 10.0,
-                    y1 = 0.0,
-                    x2 = 150.0,
-                    y2 = 0.25,
-                )
-            }
-
-            ageSeconds <= 300 -> {
-                interpolate(
-                    x = ageSeconds.toDouble(),
-                    x1 = 150.0,
-                    y1 = 0.25,
-                    x2 = 300.0,
-                    y2 = 0.5,
-                )
-            }
-
-            ageSeconds <= 3_600 -> {
-                interpolate(
-                    x = ageSeconds.toDouble(),
-                    x1 = 300.0,
-                    y1 = 0.5,
-                    x2 = 3_600.0,
-                    y2 = 1.0,
-                )
-            }
-
-            ageSeconds <= 86_400 -> {
-                interpolate(
-                    x = ageSeconds.toDouble(),
-                    x1 = 3_600.0,
-                    y1 = 1.0,
-                    x2 = 86_400.0,
-                    y2 = 1.25,
-                )
-            }
-
-            else -> {
-                1.5
-            }
-        }
+        return calculateMultiplier(
+            value = ageSeconds.toDouble(),
+            points =
+                multipliers.map {
+                    it.secondsBorder.toDouble() to it.multiplier
+                },
+        )
     }
 
     fun calculateMeetChanceMultiplier(meetChance: Double): Double {
@@ -74,56 +43,84 @@ class ReviewMultiplierCalculator(
             "meetChance must be between 0 and 100"
         }
 
-        val points =
-            listOf(
-                0.32 to 0.0,
-                0.96 to 0.5,
-                2.56 to 1.0,
-                5.45 to 1.5,
-                10.80 to 2.0,
-                14.05 to 2.5,
-                25.96 to 3.0,
-            )
+        val multipliers =
+            meetChanceMultiplierRepository
+                .findAll()
+                .sortedBy { it.meetChanceBorder }
 
-        if (meetChance <= points.first().first) {
-            return 0.0
-        }
-
-        if (meetChance >= points.last().first) {
-            return 3.0
-        }
-
-        val (lower, upper) =
-            points
-                .zipWithNext()
-                .first { (lower, upper) ->
-                    meetChance >= lower.first && meetChance <= upper.first
-                }
-
-        return interpolate(
-            x = meetChance,
-            x1 = lower.first,
-            y1 = lower.second,
-            x2 = upper.first,
-            y2 = upper.second,
+        return calculateMultiplier(
+            value = meetChance,
+            points =
+                multipliers.map {
+                    it.meetChanceBorder to it.multiplier
+                },
         )
     }
 
     fun calculateDifficultyMultiplier(answers: List<AnswerResult>): Double {
         if (answers.isEmpty()) {
-            return 1.5
+            return 1.0
         }
 
-        val averageScore =
+        val recentAnswers =
             answers
                 .sortedByDescending { it.createdAt }
                 .take(MAX_RECENT_ANSWERS)
-                .map { it.score.coerceIn(0, 10) }
-                .average()
 
-        val difficulty = 1.0 - averageScore / 10.0
+        var totalScore = 0.0
 
-        return 1.0 + difficulty
+        for (answer in recentAnswers) {
+            totalScore += answer.score.coerceIn(0, 10)
+        }
+
+        val averageScore = totalScore / recentAnswers.size
+
+        val multipliers =
+            difficultyMultiplierRepository
+                .findAll()
+                .sortedBy { it.lastAnswerScoreBorder }
+
+        return calculateMultiplier(
+            value = averageScore,
+            points =
+                multipliers.map {
+                    it.lastAnswerScoreBorder.toDouble() to it.multiplier
+                },
+        )
+    }
+
+    private fun calculateMultiplier(
+        value: Double,
+        points: List<Pair<Double, Double>>,
+    ): Double {
+        require(points.isNotEmpty()) {
+            "Multiplier configuration must not be empty"
+        }
+
+        if (value <= points.first().first) {
+            return points.first().second
+        }
+
+        if (value >= points.last().first) {
+            return points.last().second
+        }
+
+        for (i in 0 until points.size - 1) {
+            val lower = points[i]
+            val upper = points[i + 1]
+
+            if (value >= lower.first && value <= upper.first) {
+                return interpolate(
+                    x = value,
+                    x1 = lower.first,
+                    y1 = lower.second,
+                    x2 = upper.first,
+                    y2 = upper.second,
+                )
+            }
+        }
+
+        error("Could not find multiplier range for value: $value")
     }
 
     private fun interpolate(
