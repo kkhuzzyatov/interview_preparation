@@ -28,10 +28,16 @@ class SettingsService(
     private val scoreColorRepository: ScoreColorRepository,
 ) {
     fun get(): SettingsResponseDto {
-        val applicationSettings = generalApplicationSettingsRepository.findAll().first()
+        val applicationSettings =
+            generalApplicationSettingsRepository
+                .findAll()
+                .first()
 
         return SettingsResponseDto(
             answerEvaluationPrompt = applicationSettings.answerEvaluationPrompt,
+            newCardRecencyMultiplier = applicationSettings.newCardRecencyMultiplier,
+            newCardDifficultyMultiplier = applicationSettings.newCardDifficultyMultiplier,
+            newCardColor = applicationSettings.newCardColor,
             difficultyMultipliers =
                 difficultyMultiplierRepository
                     .findAll()
@@ -87,6 +93,9 @@ class SettingsService(
             GeneralApplicationSettings(
                 generalApplicationSettingId = null,
                 answerEvaluationPrompt = request.answerEvaluationPrompt,
+                newCardRecencyMultiplier = request.newCardRecencyMultiplier,
+                newCardDifficultyMultiplier = request.newCardDifficultyMultiplier,
+                newCardColor = request.newCardColor,
             ),
         )
 

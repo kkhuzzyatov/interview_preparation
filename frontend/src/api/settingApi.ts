@@ -29,6 +29,9 @@ export interface ScoreColor {
 
 export interface ApplicationSettings {
   answerEvaluationPrompt: string;
+  newCardRecencyMultiplier: number;
+  newCardDifficultyMultiplier: number;
+  newCardColor: string;
   difficultyMultipliers: DifficultyMultiplier[];
   meetChanceMultipliers: MeetChanceMultiplier[];
   recencyMultipliers: RecencyMultiplier[];
@@ -37,6 +40,9 @@ export interface ApplicationSettings {
 
 export interface SettingsRequest {
   answerEvaluationPrompt: string;
+  newCardRecencyMultiplier: number;
+  newCardDifficultyMultiplier: number;
+  newCardColor: string;
   difficultyMultipliers: DifficultyMultiplier[];
   meetChanceMultipliers: MeetChanceMultiplier[];
   recencyMultipliers: RecencyMultiplier[];

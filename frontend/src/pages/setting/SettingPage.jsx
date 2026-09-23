@@ -8,6 +8,9 @@ import {
 
 const DEFAULT_SETTINGS = {
   answerEvaluationPrompt: "",
+  newCardRecencyMultiplier: 1.5,
+  newCardDifficultyMultiplier: 1.5,
+  newCardColor: "#2563eb",
 
   difficultyMultipliers: [],
   meetChanceMultipliers: [],
@@ -48,6 +51,15 @@ function normalizeSettings(settings) {
     answerEvaluationPrompt:
       settings.answerEvaluationPrompt ?? "",
 
+    newCardRecencyMultiplier:
+      settings.newCardRecencyMultiplier ?? 1.5,
+
+    newCardDifficultyMultiplier:
+      settings.newCardDifficultyMultiplier ?? 1.5,
+
+    newCardColor:
+      settings.newCardColor ?? "#2563eb",
+
     difficultyMultipliers:
       settings.difficultyMultipliers ?? [],
 
@@ -65,6 +77,14 @@ function normalizeSettings(settings) {
 function toRequest(settings) {
   return {
     answerEvaluationPrompt: settings.answerEvaluationPrompt,
+
+    newCardRecencyMultiplier:
+      Number(settings.newCardRecencyMultiplier),
+
+    newCardDifficultyMultiplier:
+      Number(settings.newCardDifficultyMultiplier),
+
+    newCardColor: settings.newCardColor,
 
     difficultyMultipliers:
       settings.difficultyMultipliers.map((item) => ({
@@ -135,6 +155,36 @@ export default function SettingPage() {
     setSettings((previous) => ({
       ...previous,
       answerEvaluationPrompt: event.target.value,
+    }));
+
+    setSuccess("");
+    setError("");
+  }
+
+  function handleNewCardRecencyMultiplierChange(event) {
+    setSettings((previous) => ({
+      ...previous,
+      newCardRecencyMultiplier: event.target.value,
+    }));
+
+    setSuccess("");
+    setError("");
+  }
+
+  function handleNewCardDifficultyMultiplierChange(event) {
+    setSettings((previous) => ({
+      ...previous,
+      newCardDifficultyMultiplier: event.target.value,
+    }));
+
+    setSuccess("");
+    setError("");
+  }
+
+  function handleNewCardColorChange(event) {
+    setSettings((previous) => ({
+      ...previous,
+      newCardColor: event.target.value,
     }));
 
     setSuccess("");
@@ -262,6 +312,69 @@ export default function SettingPage() {
               rows={8}
               disabled={saving}
             />
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <h2>New cards</h2>
+
+          <p>
+            Settings used when selecting new cards for review.
+          </p>
+
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <label htmlFor="newCardRecencyMultiplier">
+                RECENCY MULTIPLIER
+              </label>
+
+              <input
+                id="newCardRecencyMultiplier"
+                type="number"
+                step="any"
+                value={settings.newCardRecencyMultiplier}
+                onChange={handleNewCardRecencyMultiplierChange}
+                disabled={saving}
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="newCardDifficultyMultiplier">
+                DIFFICULTY MULTIPLIER
+              </label>
+
+              <input
+                id="newCardDifficultyMultiplier"
+                type="number"
+                step="any"
+                value={settings.newCardDifficultyMultiplier}
+                onChange={handleNewCardDifficultyMultiplierChange}
+                disabled={saving}
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="newCardColor">
+                COLOR
+              </label>
+
+              <div className={styles.colorInput}>
+                <input
+                  id="newCardColor"
+                  type="color"
+                  value={settings.newCardColor}
+                  onChange={handleNewCardColorChange}
+                  disabled={saving}
+                />
+
+                <input
+                  type="text"
+                  value={settings.newCardColor}
+                  onChange={handleNewCardColorChange}
+                  disabled={saving}
+                />
+              </div>
+            </div>
           </div>
         </section>
 
