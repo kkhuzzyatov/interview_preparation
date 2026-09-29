@@ -1,7 +1,6 @@
 package com.backend.review.service
 
 import com.backend.answer.dto.AnswerResult
-import com.backend.answer.entity.Answer
 import com.backend.answer.entity.AnswerProcessing
 import com.backend.answer.entity.AnswerProcessingStatus
 import com.backend.answer.repository.AnswerProcessingRepository
@@ -29,7 +28,7 @@ class ReviewService(
     fun getNextCard(
         principal: Principal,
         deskIds: Collection<UUID>,
-    ): Card {
+    ): ReviewSelection {
         val userId = UUID.fromString(principal.name)
 
         val user =
@@ -50,36 +49,49 @@ class ReviewService(
         val weightedCards =
             cards
                 .map { card ->
-                    WeightedCard(
-                        card = card,
-                        weight =
-                            calculateWeight(
-                                card = card,
-                                answers =
-                                    answerRepository
-                                        .findByCardIdOrderByCreatedAtDesc(card.id),
-                            ),
-                    )
+                    calculateWeightedCard(card)
                 }.filter { it.weight > 0.0 }
 
         if (weightedCards.isEmpty()) {
             throw NoCardsAvailableException()
         }
 
-        val card = selectRandomCard(weightedCards)
+        val selectedCard = selectRandomCard(weightedCards)
+        val totalWeight = weightedCards.sumOf { it.weight }
+
+        val selectionProbability =
+            calculateSelectionProbability(
+                selectedCard = selectedCard,
+                totalWeight = totalWeight,
+            )
 
         createAnswerProcessing(
             userId = user.id,
-            cardId = card.id,
+            cardId = selectedCard.card.id,
         )
 
-        return card
+        return ReviewSelection(
+            card = selectedCard.card,
+            difficultyMultiplier = selectedCard.difficultyMultiplier,
+            meetChanceMultiplier = selectedCard.meetChanceMultiplier,
+            recencyMultiplier = selectedCard.recencyMultiplier,
+            selectionProbability = selectionProbability,
+        )
     }
 
-    private fun calculateWeight(
-        card: Card,
-        answers: List<Answer>,
-    ): Double {
+    private fun calculateWeightedCard(card: Card): WeightedCard {
+        val answers =
+            answerRepository
+                .findByCardIdOrderByCreatedAtDesc(card.id)
+
+        val answerResults =
+            answers.map {
+                AnswerResult(
+                    score = it.score,
+                    createdAt = it.createdAt,
+                )
+            }
+
         val meetChanceMultiplier =
             multiplierService.calculateMeetChanceMultiplier(
                 card.meetChance.toDouble(),
@@ -87,30 +99,23 @@ class ReviewService(
 
         val difficultyMultiplier =
             multiplierService.calculateDifficultyMultiplier(
-                answers.map {
-                    AnswerResult(
-                        score = it.score,
-                        createdAt = it.createdAt,
-                    )
-                },
+                answerResults,
             )
 
         val recencyMultiplier =
-            answers
-                .firstOrNull()
-                ?.let {
-                    multiplierService.calculateRecencyMultiplier(
-                        it.createdAt,
-                    )
-                }
-                ?: 1.5
+            multiplierService.calculateRecencyMultiplier(
+                answerResults,
+            )
 
-        return meetChanceMultiplier *
-            difficultyMultiplier *
-            recencyMultiplier
+        return WeightedCard(
+            card = card,
+            difficultyMultiplier = difficultyMultiplier,
+            meetChanceMultiplier = meetChanceMultiplier,
+            recencyMultiplier = recencyMultiplier,
+        )
     }
 
-    private fun selectRandomCard(weightedCards: List<WeightedCard>): Card {
+    private fun selectRandomCard(weightedCards: List<WeightedCard>): WeightedCard {
         val totalWeight = weightedCards.sumOf { it.weight }
         val randomValue = Random.nextDouble() * totalWeight
 
@@ -120,12 +125,23 @@ class ReviewService(
             accumulatedWeight += weightedCard.weight
 
             if (randomValue < accumulatedWeight) {
-                return weightedCard.card
+                return weightedCard
             }
         }
 
         // Protect against floating-point rounding.
-        return weightedCards.last().card
+        return weightedCards.last()
+    }
+
+    private fun calculateSelectionProbability(
+        selectedCard: WeightedCard,
+        totalWeight: Double,
+    ): Double {
+        if (totalWeight <= 0.0) {
+            return 0.0
+        }
+
+        return selectedCard.weight / totalWeight * 100.0
     }
 
     private fun createAnswerProcessing(

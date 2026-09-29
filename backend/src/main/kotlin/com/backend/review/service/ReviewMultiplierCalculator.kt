@@ -2,6 +2,7 @@ package com.backend.review.service
 
 import com.backend.answer.dto.AnswerResult
 import com.backend.settings.repository.DifficultyMultiplierRepository
+import com.backend.settings.repository.GeneralApplicationSettingsRepository
 import com.backend.settings.repository.MeetChanceMultiplierRepository
 import com.backend.settings.repository.RecencyMultiplierRepository
 import org.springframework.stereotype.Service
@@ -12,12 +13,14 @@ import java.time.LocalDateTime
 @Service
 class ReviewMultiplierCalculator(
     private val clock: Clock,
+    private val generalApplicationSettingsRepository: GeneralApplicationSettingsRepository,
     private val recencyMultiplierRepository: RecencyMultiplierRepository,
     private val meetChanceMultiplierRepository: MeetChanceMultiplierRepository,
     private val difficultyMultiplierRepository: DifficultyMultiplierRepository,
 ) {
     fun calculateRecencyMultiplier(answeredAt: LocalDateTime): Double {
         val now = LocalDateTime.now(clock)
+
         val ageSeconds =
             Duration
                 .between(answeredAt, now)
@@ -59,7 +62,8 @@ class ReviewMultiplierCalculator(
 
     fun calculateDifficultyMultiplier(answers: List<AnswerResult>): Double {
         if (answers.isEmpty()) {
-            return 1.0
+            return getGeneralApplicationSettings()
+                .newCardDifficultyMultiplier
         }
 
         val recentAnswers =
@@ -88,6 +92,27 @@ class ReviewMultiplierCalculator(
                 },
         )
     }
+
+    fun calculateRecencyMultiplier(answers: List<AnswerResult>): Double {
+        val lastAnswer =
+            answers
+                .maxByOrNull { it.createdAt }
+
+        return lastAnswer
+            ?.let {
+                calculateRecencyMultiplier(it.createdAt)
+            }
+            ?: getGeneralApplicationSettings()
+                .newCardRecencyMultiplier
+    }
+
+    private fun getGeneralApplicationSettings() =
+        generalApplicationSettingsRepository
+            .findAll()
+            .singleOrNull()
+            ?: throw IllegalStateException(
+                "General application settings must contain exactly one record",
+            )
 
     private fun calculateMultiplier(
         value: Double,
