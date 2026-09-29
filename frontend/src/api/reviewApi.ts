@@ -8,7 +8,11 @@ export interface ReviewCardResponse {
   deskId: string;
   deskName: string;
   question: string;
-  answer: string;
+  meetChance: number;
+  difficultyMultiplier: number;
+  meetChanceMultiplier: number;
+  recencyMultiplier: number;
+  selectionProbability: number;
 }
 
 export interface AnswerRequest {

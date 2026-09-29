@@ -37,12 +37,22 @@ class ReviewController(
         principal: Principal,
         @RequestBody request: NextCardRequest,
     ): ResponseEntity<ReviewCardResponse> {
-        val card = reviewService.getNextCard(principal, request.deskIds)
+        val result =
+            reviewService.getNextCard(
+                principal = principal,
+                deskIds = request.deskIds,
+            )
+
+        val card = result.card
 
         log
             .atInfo()
             .addKeyValue("cardId", card.id)
             .addKeyValue("deskId", card.desk.id)
+            .addKeyValue("difficultyMultiplier", result.difficultyMultiplier)
+            .addKeyValue("meetChanceMultiplier", result.meetChanceMultiplier)
+            .addKeyValue("recencyMultiplier", result.recencyMultiplier)
+            .addKeyValue("selectionProbability", result.selectionProbability)
             .log("Getting next card for review")
 
         val response =
@@ -51,6 +61,11 @@ class ReviewController(
                 deskId = card.desk.id,
                 deskName = card.desk.name,
                 question = card.question,
+                meetChance = card.meetChance,
+                difficultyMultiplier = result.difficultyMultiplier,
+                meetChanceMultiplier = result.meetChanceMultiplier,
+                recencyMultiplier = result.recencyMultiplier,
+                selectionProbability = result.selectionProbability,
             )
 
         return ResponseEntity.ok(response)
