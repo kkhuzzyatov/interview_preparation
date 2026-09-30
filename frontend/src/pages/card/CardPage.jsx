@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./CardPage.module.css";
 import {
+  createCard,
+  deleteCard,
+} from "../../api/cardApi";
+import {
   getAllDesks,
   getDeskById,
 } from "../../api/deskApi";
@@ -13,13 +17,19 @@ export default function CardsPage() {
 
   const [search, setSearch] = useState("");
   const [expandedCards, setExpandedCards] = useState(
-    new Set()
+    new Set(),
   );
+
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [creating, setCreating] = useState(false);
 
   const [loadingDesks, setLoadingDesks] = useState(true);
   const [loadingCards, setLoadingCards] = useState(false);
+  const [deletingCardId, setDeletingCardId] = useState(null);
 
   const [error, setError] = useState("");
+  const [formError, setFormError] = useState("");
 
   useEffect(() => {
     async function loadDesks() {
@@ -33,7 +43,7 @@ export default function CardsPage() {
         setError(
           err instanceof Error
             ? err.message
-            : "Failed to load desks"
+            : "Failed to load desks",
         );
       } finally {
         setLoadingDesks(false);
@@ -47,6 +57,7 @@ export default function CardsPage() {
     if (!selectedDeskId) {
       setCards([]);
       setExpandedCards(new Set());
+      setSearch("");
       return;
     }
 
@@ -60,7 +71,7 @@ export default function CardsPage() {
         setCards(
           Array.isArray(desk.cards)
             ? desk.cards
-            : []
+            : [],
         );
 
         setExpandedCards(new Set());
@@ -70,7 +81,7 @@ export default function CardsPage() {
         setError(
           err instanceof Error
             ? err.message
-            : "Failed to load cards"
+            : "Failed to load cards",
         );
       } finally {
         setLoadingCards(false);
@@ -98,10 +109,98 @@ export default function CardsPage() {
     setCards((previous) =>
       previous.map((card) =>
         card.id === updatedCard.id
-          ? updatedCard
-          : card
-      )
+          ? {
+              ...card,
+              ...updatedCard,
+            }
+          : card,
+      ),
     );
+  }
+
+  async function handleCreate(event) {
+    event.preventDefault();
+
+    const trimmedQuestion = question.trim();
+    const trimmedAnswer = answer.trim();
+
+    if (!selectedDeskId) {
+      setFormError("Select a desk first.");
+      return;
+    }
+
+    if (!trimmedQuestion) {
+      setFormError("Question is required.");
+      return;
+    }
+
+    if (!trimmedAnswer) {
+      setFormError("Answer is required.");
+      return;
+    }
+
+    try {
+      setCreating(true);
+      setFormError("");
+      setError("");
+
+      const createdCard = await createCard({
+        question: trimmedQuestion,
+        answer: trimmedAnswer,
+        deskId: selectedDeskId,
+      });
+
+      setCards((previous) => [
+        ...previous,
+        createdCard,
+      ]);
+
+      setQuestion("");
+      setAnswer("");
+    } catch (err) {
+      setFormError(
+        err instanceof Error
+          ? err.message
+          : "Failed to create card",
+      );
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  async function handleCardDeleted(cardId) {
+    const confirmed = window.confirm(
+      "Delete this card?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDeletingCardId(cardId);
+      setError("");
+
+      await deleteCard(cardId);
+
+      setCards((previous) =>
+        previous.filter((card) => card.id !== cardId),
+      );
+
+      setExpandedCards((previous) => {
+        const next = new Set(previous);
+        next.delete(cardId);
+        return next;
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to delete card",
+      );
+    } finally {
+      setDeletingCardId(null);
+    }
   }
 
   const filteredCards = useMemo(() => {
@@ -114,30 +213,15 @@ export default function CardsPage() {
     return cards.filter((card) =>
       card.question
         .toLowerCase()
-        .includes(query)
+        .includes(query),
     );
   }, [cards, search]);
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <div className={styles.eyebrow}>
-            CARDS
-          </div>
-
-          <h1>Cards</h1>
-        </div>
-      </header>
 
       <section className={styles.controls}>
         <div className={styles.selectWrapper}>
-          <label
-            className={styles.label}
-            htmlFor="desk"
-          >
-            DESK
-          </label>
 
           <select
             id="desk"
@@ -146,6 +230,9 @@ export default function CardsPage() {
             onChange={(event) => {
               setSelectedDeskId(event.target.value);
               setSearch("");
+              setQuestion("");
+              setAnswer("");
+              setFormError("");
             }}
             disabled={loadingDesks}
           >
@@ -166,12 +253,6 @@ export default function CardsPage() {
 
         {selectedDeskId && (
           <div className={styles.searchWrapper}>
-            <label
-              className={styles.label}
-              htmlFor="card-search"
-            >
-              SEARCH
-            </label>
 
             <input
               id="card-search"
@@ -186,6 +267,56 @@ export default function CardsPage() {
           </div>
         )}
       </section>
+
+      {selectedDeskId && (
+        <section className={styles.createSection}>
+
+          <form
+            className={styles.createForm}
+            onSubmit={handleCreate}
+          >
+            <textarea
+              className={styles.textarea}
+              placeholder="Question..."
+              value={question}
+              onChange={(event) =>
+                setQuestion(event.target.value)
+              }
+              rows={3}
+              disabled={creating}
+            />
+
+            <textarea
+              className={styles.textarea}
+              placeholder="Answer..."
+              value={answer}
+              onChange={(event) =>
+                setAnswer(event.target.value)
+              }
+              rows={5}
+              disabled={creating}
+            />
+
+            {formError && (
+              <div className={styles.formError}>
+                {formError}
+              </div>
+            )}
+
+            <div className={styles.createActions}>
+              <button
+                type="submit"
+                className={styles.createButton}
+                disabled={creating}
+              >
+                {creating
+                  ? "Creating..."
+                  : "Create card"}
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
 
       {error && (
         <div className={styles.error}>
@@ -229,6 +360,12 @@ export default function CardsPage() {
                   toggleCard(card.id)
                 }
                 onUpdated={handleCardUpdated}
+                onDeleted={() =>
+                  handleCardDeleted(card.id)
+                }
+                isDeleting={
+                  deletingCardId === card.id
+                }
               />
             ))}
           </section>

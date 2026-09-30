@@ -7,6 +7,8 @@ export default function CardItem({
   isExpanded,
   onToggle,
   onUpdated,
+  onDeleted,
+  isDeleting,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [question, setQuestion] = useState(card.question);
@@ -33,13 +35,26 @@ export default function CardItem({
   }
 
   async function handleSave() {
+    const trimmedQuestion = question.trim();
+    const trimmedAnswer = answer.trim();
+
+    if (!trimmedQuestion) {
+      setError("Question is required.");
+      return;
+    }
+
+    if (!trimmedAnswer) {
+      setError("Answer is required.");
+      return;
+    }
+
     try {
       setSaving(true);
       setError("");
 
       const updatedCard = await updateCard(card.id, {
-        question,
-        answer,
+        question: trimmedQuestion,
+        answer: trimmedAnswer,
       });
 
       onUpdated(updatedCard);
@@ -48,11 +63,15 @@ export default function CardItem({
       setError(
         err instanceof Error
           ? err.message
-          : "Failed to update card"
+          : "Failed to update card",
       );
     } finally {
       setSaving(false);
     }
+  }
+
+  function handleDelete() {
+    onDeleted();
   }
 
   return (
@@ -67,9 +86,18 @@ export default function CardItem({
             type="button"
             className={styles.updateButton}
             onClick={handleEdit}
-            disabled={saving}
+            disabled={saving || isDeleting}
           >
             UPDATE
+          </button>
+
+          <button
+            type="button"
+            className={styles.deleteButton}
+            onClick={handleDelete}
+            disabled={saving || isDeleting}
+          >
+            {isDeleting ? "DELETING..." : "DELETE"}
           </button>
 
           <button
@@ -78,9 +106,12 @@ export default function CardItem({
               isExpanded ? styles.expanded : ""
             }`}
             onClick={onToggle}
+            disabled={isDeleting}
             aria-expanded={isExpanded}
             aria-label={
-              isExpanded ? "Hide answer" : "Show answer"
+              isExpanded
+                ? "Hide answer"
+                : "Show answer"
             }
           >
             <span>+</span>

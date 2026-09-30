@@ -13,8 +13,10 @@ export const API_ENDPOINTS = {
   },
 
   cards: {
-    update: (cardId: string) =>
-      `/cards/${cardId}`,
+    all: "/cards",
+    byId: (cardId: string) => `/cards/${cardId}`,
+    update: (cardId: string) => `/cards/${cardId}`,
+    delete: (cardId: string) => `/cards/${cardId}`,
   },
 
   settings: {
