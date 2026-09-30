@@ -38,10 +38,11 @@ export default function Header({
         </button>
 
         {isAdmin && (
-          <>
+          <div className={styles.adminNavigation}>
+
             <button
               type="button"
-              className={styles.navButton}
+              className={`${styles.navButton} ${styles.adminNavButton}`}
               onClick={() => navigate("/topics")}
             >
               TOPICS
@@ -49,7 +50,7 @@ export default function Header({
 
             <button
               type="button"
-              className={styles.navButton}
+              className={`${styles.navButton} ${styles.adminNavButton}`}
               onClick={() => navigate("/desks")}
             >
               DESKS
@@ -57,7 +58,7 @@ export default function Header({
 
             <button
               type="button"
-              className={styles.navButton}
+              className={`${styles.navButton} ${styles.adminNavButton}`}
               onClick={() => navigate("/cards")}
             >
               CARDS
@@ -65,12 +66,12 @@ export default function Header({
 
             <button
               type="button"
-              className={styles.navButton}
+              className={`${styles.navButton} ${styles.adminNavButton}`}
               onClick={() => navigate("/settings")}
             >
               SETTINGS
             </button>
-          </>
+          </div>
         )}
       </div>
 

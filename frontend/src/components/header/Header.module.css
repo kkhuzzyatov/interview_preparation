@@ -37,6 +37,7 @@
   transition:
     background 0.15s ease,
     border-color 0.15s ease,
+    color 0.15s ease,
     transform 0.15s ease;
 }
 
@@ -49,10 +50,59 @@
   transform: translateY(1px);
 }
 
+/* =========================
+   ADMIN NAVIGATION
+   ========================= */
+
+.adminNavigation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-left: 12px;
+  padding-left: 16px;
+
+  border-left: 1px solid #d1d5db;
+}
+
+.adminNavButton {
+  border-color: #d1d5db;
+  background: #f9fafb;
+  color: #374151;
+}
+
+.adminNavButton:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: #111827;
+}
+
 .version {
   font-size: 12px;
   font-weight: 600;
   color: #9ca3af;
+}
+
+@media (max-width: 1000px) {
+  .header {
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .navigation {
+    flex-wrap: wrap;
+  }
+
+  .adminNavigation {
+    margin-left: 0;
+    padding-left: 0;
+
+    border-left: none;
+  }
+
+  .adminLabel {
+    width: 100%;
+  }
 }
 
 @media (max-width: 600px) {
@@ -60,8 +110,20 @@
     padding: 12px 16px;
   }
 
+  .navigation {
+    gap: 6px;
+  }
+
   .navButton {
     min-width: 80px;
     padding: 9px 12px;
+  }
+
+  .adminNavigation {
+    gap: 6px;
+  }
+
+  .version {
+    flex-shrink: 0;
   }
 }
