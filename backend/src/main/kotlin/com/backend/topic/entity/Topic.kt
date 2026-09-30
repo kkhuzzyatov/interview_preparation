@@ -1,4 +1,4 @@
-package com.backend.desk.entity
+package com.backend.topic.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
