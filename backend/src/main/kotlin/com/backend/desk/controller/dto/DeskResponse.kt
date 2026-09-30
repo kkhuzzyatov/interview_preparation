@@ -5,4 +5,5 @@ import java.util.UUID
 data class DeskResponse(
     val id: UUID,
     val name: String,
+    val topicId: UUID,
 )

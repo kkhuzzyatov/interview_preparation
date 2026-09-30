@@ -1,6 +1,7 @@
 package com.backend.desk.entity
 
 import com.backend.card.entity.Card
+import com.backend.topic.entity.Topic
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -21,7 +22,7 @@ class Desk(
     var name: String,
     @ManyToOne
     @JoinColumn(name = "topic_id", nullable = false)
-    val topic: Topic,
+    var topic: Topic,
     @OneToMany(
         mappedBy = "desk",
         cascade = [CascadeType.ALL],

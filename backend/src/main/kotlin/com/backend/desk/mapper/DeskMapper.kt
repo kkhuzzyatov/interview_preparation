@@ -10,15 +10,13 @@ object DeskMapper {
         DeskResponse(
             id = entity.id,
             name = entity.name,
+            topicId = entity.topic.id,
         )
 
     fun toResponseWithCards(entity: Desk): DeskWithCardsResponse =
         DeskWithCardsResponse(
             id = entity.id,
             name = entity.name,
-            cards =
-                entity.cards.map { card ->
-                    CardMapper.toResponse(card)
-                },
+            cards = entity.cards.map(CardMapper::toResponse),
         )
 }
