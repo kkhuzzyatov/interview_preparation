@@ -6,28 +6,30 @@ import {
 export interface DeskResponse {
   id: string;
   name: string;
+  topicId: string;
 }
 
-export interface CardResponse {
+export interface DeskWithCardsResponse {
   id: string;
-  question: string;
-  answer: string;
+  name: string;
+  cards: unknown[];
 }
 
-export interface DeskWithCardsResponse
-  extends DeskResponse {
-  cards: CardResponse[];
+export interface DeskStatisticsResponse {
+  totalDesks: number;
+  totalCards: number;
+  totalAnswers: number;
+  averageScore: number;
 }
 
-export interface ScoreColorStatistics {
-  colorHex: string;
-  count: number;
+export interface CreateDeskRequest {
+  name: string;
+  topicId: string;
 }
 
-export interface DeskCardLevelStatisticsResponse {
-  deskId: string;
-  deskName: string;
-  statistics: ScoreColorStatistics[];
+export interface UpdateDeskRequest {
+  name: string;
+  topicId: string;
 }
 
 async function handleResponse<T>(
@@ -60,6 +62,10 @@ async function handleResponse<T>(
     throw new Error(message);
   }
 
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   return response.json() as Promise<T>;
 }
 
@@ -73,7 +79,9 @@ function getAuthHeaders(): HeadersInit {
     : {};
 }
 
-async function get<T>(endpoint: string): Promise<T> {
+async function get<T>(
+  endpoint: string,
+): Promise<T> {
   const response = await fetch(
     `${API_BASE_URL}${endpoint}`,
     {
@@ -84,6 +92,62 @@ async function get<T>(endpoint: string): Promise<T> {
 
   return handleResponse<T>(response);
 }
+
+async function post<TRequest, TResponse>(
+  endpoint: string,
+  body: TRequest,
+): Promise<TResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}${endpoint}`,
+    {
+      method: "POST",
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    },
+  );
+
+  return handleResponse<TResponse>(response);
+}
+
+async function put<TRequest, TResponse>(
+  endpoint: string,
+  body: TRequest,
+): Promise<TResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}${endpoint}`,
+    {
+      method: "PUT",
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    },
+  );
+
+  return handleResponse<TResponse>(response);
+}
+
+async function del(
+  endpoint: string,
+): Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}${endpoint}`,
+    {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    },
+  );
+
+  await handleResponse<void>(response);
+}
+
+/* =========================
+   GET
+   ========================= */
 
 export function getAllDesks(): Promise<DeskResponse[]> {
   return get<DeskResponse[]>(
@@ -99,10 +163,47 @@ export function getDeskById(
   );
 }
 
-export function getDeskStatistics(): Promise<
-  DeskCardLevelStatisticsResponse[]
-> {
-  return get<DeskCardLevelStatisticsResponse[]>(
+export function getDeskStatistics(): Promise<DeskStatisticsResponse> {
+  return get<DeskStatisticsResponse>(
     API_ENDPOINTS.desks.statistics,
+  );
+}
+
+/* =========================
+   POST
+   ========================= */
+
+export function createDesk(
+  request: CreateDeskRequest,
+): Promise<DeskResponse> {
+  return post<CreateDeskRequest, DeskResponse>(
+    API_ENDPOINTS.desks.all,
+    request,
+  );
+}
+
+/* =========================
+   PUT
+   ========================= */
+
+export function updateDesk(
+  deskId: string,
+  request: UpdateDeskRequest,
+): Promise<DeskResponse> {
+  return put<UpdateDeskRequest, DeskResponse>(
+    API_ENDPOINTS.desks.byId(deskId),
+    request,
+  );
+}
+
+/* =========================
+   DELETE
+   ========================= */
+
+export function deleteDesk(
+  deskId: string,
+): Promise<void> {
+  return del(
+    API_ENDPOINTS.desks.byId(deskId),
   );
 }

@@ -18,6 +18,7 @@ import AnswerPage from "./pages/answer/AnswerPage";
 import LeaderboardPage from "./pages/leaderboard/LeaderboardPage";
 import CardPage from "./pages/card/CardPage";
 import TopicPage from "./pages/topic/TopicPage";
+import DeskPage from "./pages/desk/DeskPage";
 import SettingPage from "./pages/setting/SettingPage";
 
 import { getCurrentUser } from "./api/userApi";
@@ -129,6 +130,11 @@ export default function App() {
             <Route
               path="/topics"
               element={<TopicPage />}
+            />
+
+            <Route
+              path="/desks"
+              element={<DeskPage />}
             />
 
             <Route

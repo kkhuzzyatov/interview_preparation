@@ -29,8 +29,32 @@ export default function Header({
           ANSWERS
         </button>
 
+        <button
+          type="button"
+          className={styles.navButton}
+          onClick={() => navigate("/leaderboard")}
+        >
+          LEADERBOARD
+        </button>
+
         {isAdmin && (
           <>
+            <button
+              type="button"
+              className={styles.navButton}
+              onClick={() => navigate("/topics")}
+            >
+              TOPICS
+            </button>
+
+            <button
+              type="button"
+              className={styles.navButton}
+              onClick={() => navigate("/desks")}
+            >
+              DESKS
+            </button>
+
             <button
               type="button"
               className={styles.navButton}
@@ -48,14 +72,6 @@ export default function Header({
             </button>
           </>
         )}
-
-        <button
-          type="button"
-          className={styles.navButton}
-          onClick={() => navigate("/leaderboard")}
-        >
-          LEADERBOARD
-        </button>
       </div>
 
       <div className={styles.version}>
