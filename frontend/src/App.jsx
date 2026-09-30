@@ -17,6 +17,7 @@ import ReviewPage from "./pages/review/ReviewPage";
 import AnswerPage from "./pages/answer/AnswerPage";
 import LeaderboardPage from "./pages/leaderboard/LeaderboardPage";
 import CardPage from "./pages/card/CardPage";
+import TopicPage from "./pages/topic/TopicPage";
 import SettingPage from "./pages/setting/SettingPage";
 
 import { getCurrentUser } from "./api/userApi";
@@ -125,6 +126,11 @@ export default function App() {
           />
 
           <Route element={<AdminRoute />}>
+            <Route
+              path="/topics"
+              element={<TopicPage />}
+            />
+
             <Route
               path="/cards"
               element={<CardPage />}

@@ -42,6 +42,12 @@ export const API_ENDPOINTS = {
     statistics: "/desks/statistics",
   },
 
+  topics: {
+    all: "/topics",
+    byId: (topicId: string) =>
+      `/topics/${topicId}`,
+  },
+
   leaderboard: {
     day: "/leaderboard/day",
     week: "/leaderboard/week",
