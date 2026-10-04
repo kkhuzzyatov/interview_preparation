@@ -32,9 +32,7 @@ export default function ReviewPage() {
         const data = await getAllDesks();
 
         setDesks(data);
-
-        // Select all desks by default.
-        setSelectedDeskIds(data.map((desk) => desk.id));
+        // Desks are intentionally not selected by default.
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load desks"
@@ -91,18 +89,21 @@ export default function ReviewPage() {
   }
 
   useEffect(() => {
-    if (!loadingDesks && selectedDeskIds.length > 0) {
-      fetchCard({ initial: true });
+    if (loadingDesks) {
+      return;
     }
 
-    if (!loadingDesks && selectedDeskIds.length === 0) {
-      setCard(null);
-      setLoading(false);
-      setResult(null);
-      setAnswer("");
-      setWasRevealed(false);
-      setError("");
+    if (selectedDeskIds.length > 0) {
+      fetchCard({ initial: true });
+      return;
     }
+
+    setCard(null);
+    setLoading(false);
+    setResult(null);
+    setAnswer("");
+    setWasRevealed(false);
+    setError("");
   }, [loadingDesks, selectedDeskIds]);
 
   function handleDeskToggle(deskId) {
@@ -126,7 +127,7 @@ export default function ReviewPage() {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    if (!card || !answer.trim()) {
+    if (!card || !answer.trim() || isProcessing) {
       return;
     }
 
@@ -150,7 +151,7 @@ export default function ReviewPage() {
   }
 
   async function handleReveal() {
-    if (!card) {
+    if (!card || isProcessing) {
       return;
     }
 
@@ -161,7 +162,6 @@ export default function ReviewPage() {
       const data = await revealAnswer(card.cardId);
 
       setWasRevealed(true);
-
       setResult({
         score: 0,
         feedback: null,

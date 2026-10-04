@@ -285,11 +285,11 @@ class AnswerService(
         Candidate's answer: %s
         
         Return ONLY valid JSON without markdown:
-        {"score":0,"feedback":"Maximum of 2 short sentences in Russian."}
+        {"score":0,"feedback":"Maximum of 2 short sentences."}
         
         Score range: [0, 10]
         """,
-            generalApplicationSettingsRepository.findAll().first(),
+            generalApplicationSettingsRepository.findAll().first().answerEvaluationPrompt,
             card.question,
             card.answer,
             userAnswer,
